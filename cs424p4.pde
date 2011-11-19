@@ -5,6 +5,10 @@ PApplet papplet;
 color backgroundColor = 0;
 color textColor = 255;
 
+WebDataSource data;
+
+CheckBox testCB;
+
 void setup()
 {
   size(1024, 768);
@@ -15,13 +19,13 @@ void setup()
   smooth();
 
   /* load data */
-  if (sketchPath == null)  // applet
-    ;//data = new WebDataSource("http://young-mountain-2805.heroku.com/");  //dataPath("jsontest")
-  else  // application
-    ;//data = new SQLiteDataSource();  
+  data = new WebDataSource("http://radiogaga.heroku.com/");
   
   /* setup UI */
   rootView = new View(0, 0, width, height);
+  
+  testCB = new CheckBox(100, 100, 20, 20);
+  rootView.subviews.add(testCB);
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {
@@ -56,6 +60,11 @@ void mouseClicked()
 
 void mouseReleased()
 {
+}
+
+void buttonClicked(CheckBox cb)
+{
+  
 }
 
 void listClicked(ListBox lb, int index, Object item)
