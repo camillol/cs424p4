@@ -53,6 +53,16 @@ class UserFilter {
     ageMax = DONTCARE;
     country = null;
   }
+  
+  String queryString()
+  {
+    String genderQ = "";
+    if ((gender & MALE) != 0) genderQ += "m";
+    if ((gender & FEMALE) != 0) genderQ += "f";
+    if ((gender & UNKNOWN) != 0) genderQ += "u";
+    if (genderQ.length() < 3 && genderQ.length() > 0) return "?gender=" + genderQ;
+    else return "";
+  }
 }
 
 class Country {
@@ -100,7 +110,7 @@ class WebDataSource {
   List<ArtistChartEntry> getTopArtists(UserFilter userFilter)
   {
     List<ArtistChartEntry> entries = new ArrayList<ArtistChartEntry>(10);
-    String request = baseURL + "top_artists";
+    String request = baseURL + "top_artists" + userFilter.queryString();
     println(request);
     try {
       JSONArray result = new JSONArray(join(loadStrings(request), ""));
