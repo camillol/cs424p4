@@ -4,7 +4,7 @@ class TopArtistView extends View implements ListDataSource {
   GlyphCheckbox femaleCB;
   GlyphCheckbox noGenderCB;
   ListBox artistListbox;
-  List<ArtistChartEntry> artists;
+  Future<List<ArtistChartEntry>> artists;
   
   TopArtistView(float x_, float y_, float w_, float h_)
   {
@@ -49,10 +49,23 @@ class TopArtistView extends View implements ListDataSource {
     noFill();
     rect(0, 0, w, h);
   }
+  
+  List<ArtistChartEntry> getArtists()
+  {
+    List<ArtistChartEntry> a = null;
+    try {
+      a = artists.get();
+    } catch (InterruptedException e) {
+      println(e);
+    } catch (ExecutionException e) {
+      println(e);
+    }
+    return a;
+  }
 
-  String getText(int index) { return artists.get(index).artist.name; }
-  Object get(int index) { return artists.get(index); }
-  int count() { return artists.size(); }
+  String getText(int index) { return artists.isDone() ? getArtists().get(index).artist.name : "Loading..."; }
+  Object get(int index) { return artists.isDone() ? getArtists().get(index) : null; }
+  int count() { return artists.isDone() ? getArtists().size() : 1; }
   boolean selected(int index) { return false; }
 }
 

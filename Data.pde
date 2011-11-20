@@ -1,4 +1,5 @@
 import org.json.*;
+import java.util.concurrent.*;
 
 class Artist {
   int id;
@@ -101,29 +102,35 @@ class ArtistChartEntry {
 
 class WebDataSource {
   String baseURL;
+  ExecutorService loadExec;
   
   WebDataSource(String baseURL)
   {
     this.baseURL = baseURL;
+    loadExec = Executors.newSingleThreadExecutor();
   }
   
-  List<ArtistChartEntry> getTopArtists(UserFilter userFilter)
+  Future<List<ArtistChartEntry>> getTopArtists(final UserFilter userFilter)
   {
-    List<ArtistChartEntry> entries = new ArrayList<ArtistChartEntry>(10);
-    String request = baseURL + "top_artists" + userFilter.queryString();
-    println(request);
-    try {
-      JSONArray result = new JSONArray(join(loadStrings(request), ""));
-      for (int i = 0; i < result.length(); i++) {
-        JSONObject aj = result.getJSONObject(i);
-        Artist artist = new Artist(aj.getInt("id"), aj.getString("mbid"), aj.getString("name"));
-        entries.add(new ArtistChartEntry(artist, aj.getInt("plays")));
+    return loadExec.submit(new Callable<List<ArtistChartEntry>>() {
+      public List<ArtistChartEntry> call() {
+        List<ArtistChartEntry> entries = new ArrayList<ArtistChartEntry>(10);
+        String request = baseURL + "top_artists" + userFilter.queryString();
+        println(request);
+        try {
+          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          for (int i = 0; i < result.length(); i++) {
+            JSONObject aj = result.getJSONObject(i);
+            Artist artist = new Artist(aj.getInt("id"), aj.getString("mbid"), aj.getString("name"));
+            entries.add(new ArtistChartEntry(artist, aj.getInt("plays")));
+          }
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return entries;
       }
-    }
-    catch (JSONException e) {
-      println (e);
-    }
-    return entries;
+    });
   }
 }
 
