@@ -1,14 +1,14 @@
 import org.json.*;
 
 class Artist {
-  String name;
   int id;
-  String ref;
+  String mbid;
+  String name;
   
-  Artist(int id, String ref, String name) {
-    this.name = name;
+  Artist(int id, String mbid, String name) {
     this.id = id;
-    this.ref = ref;
+    this.mbid = mbid;
+    this.name = name;
   }
 }
 
@@ -81,11 +81,11 @@ class Song {
 
 class ArtistChartEntry {
   Artist artist;
-  int userCount;
+  int playCount;
   
-  ArtistChartEntry(Artist artist, int userCount) {
+  ArtistChartEntry(Artist artist, int playCount) {
     this.artist = artist;
-    this.userCount = userCount;
+    this.playCount = playCount;
   }
 }
 
@@ -97,9 +97,23 @@ class WebDataSource {
     this.baseURL = baseURL;
   }
   
-/*  List<ArtistChartEntry> getTopArtists(UserFilter userFilter)
+  List<ArtistChartEntry> getTopArtists(UserFilter userFilter)
   {
-    
-  }*/
+    List<ArtistChartEntry> entries = new ArrayList<ArtistChartEntry>(10);
+    String request = baseURL + "top_artists";
+    println(request);
+    try {
+      JSONArray result = new JSONArray(join(loadStrings(request), ""));
+      for (int i = 0; i < result.length(); i++) {
+        JSONObject aj = result.getJSONObject(i);
+        Artist artist = new Artist(aj.getInt("id"), aj.getString("mbid"), aj.getString("name"));
+        entries.add(new ArtistChartEntry(artist, aj.getInt("plays")));
+      }
+    }
+    catch (JSONException e) {
+      println (e);
+    }
+    return entries;
+  }
 }
 

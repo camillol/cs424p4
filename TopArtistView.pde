@@ -1,9 +1,10 @@
-class TopArtistView extends View {
+class TopArtistView extends View implements ListDataSource {
   UserFilter userFilter;
   GlyphCheckbox maleCB;
   GlyphCheckbox femaleCB;
   GlyphCheckbox noGenderCB;
   ListBox artistListbox;
+  List<ArtistChartEntry> artists;
   
   TopArtistView(float x_, float y_, float w_, float h_)
   {
@@ -14,7 +15,9 @@ class TopArtistView extends View {
     femaleCB = makeGenderCheckbox(FEMALE, "F", 1);
     noGenderCB = makeGenderCheckbox(UNKNOWN, "?", 2);
     
-    artistListbox = new ListBox(0, 20, w, h-2, new MissingListDataSource("no artists"));
+    artists = data.getTopArtists(userFilter);
+    
+    artistListbox = new ListBox(0, 20, w, h-2, this); // new MissingListDataSource("no artists")
     subviews.add(artistListbox);
   }
   
@@ -40,5 +43,10 @@ class TopArtistView extends View {
     noFill();
     rect(0, 0, w, h);
   }
+
+  String getText(int index) { return artists.get(index).artist.name; }
+  Object get(int index) { return artists.get(index); }
+  int count() { return artists.size(); }
+  boolean selected(int index) { return false; }
 }
 

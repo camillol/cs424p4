@@ -22,7 +22,7 @@ void setup()
   smooth();
 
   /* load data */
-  data = new WebDataSource("http://radiogaga.heroku.com/");
+  data = new WebDataSource("http://localhost:3000/");//("http://radiogaga.heroku.com/");
   
   /* setup UI */
   rootView = new View(0, 0, width, height);
@@ -44,7 +44,7 @@ void setup()
   });
   rootView.subviews.add(testB);
   
-  TopArtistView topArtists = new TopArtistView(20, 20, 400, 200);
+  TopArtistView topArtists = new TopArtistView(20, 20, 400, 220);
   rootView.subviews.add(topArtists);  
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
