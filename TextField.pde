@@ -2,7 +2,7 @@ class TextField extends View {
   String value = "";
   int pos;
   color fgColor = 255;
-  final static int MARGIN = 2;
+  final static int MARGIN = 3;
   
   TextField(float x_, float y_, float w_, float h_)
   {
@@ -16,10 +16,11 @@ class TextField extends View {
     noFill();
     rect(0, 0, w, h);
     
+    fill(fgColor);
     textAlign(LEFT, CENTER);
     text(value, MARGIN, h/2);
     
-    if (focusView == this && (second() % 2 == 0)) {
+    if (focusView == this && ((millis() / 500) % 2 == 0)) {
       float tw = textWidth(value);
       line(MARGIN + tw, MARGIN, MARGIN + tw, h-MARGIN);
     }
@@ -34,7 +35,7 @@ class TextField extends View {
   void keyTyped()
   {
     if (key == CODED) println(keyCode);
-    else if (key == BACKSPACE) value = value.substring(0, value.length()-1);
+    else if (key == BACKSPACE && value.length() > 0) value = value.substring(0, value.length()-1);
     else value = value + key;
   }
 }

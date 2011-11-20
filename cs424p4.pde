@@ -12,6 +12,8 @@ WebDataSource data;
 
 Checkbox testCB;
 
+PFont font;
+
 void setup()
 {
   size(1024, 768);
@@ -26,6 +28,9 @@ void setup()
   else data = new WebDataSource("http://radiogaga.heroku.com/");
   
   /* setup UI */
+  font = loadFont("Helvetica-14.vlw");
+  textFont(font);
+  
   rootView = new View(0, 0, width, height);
   
   testCB = new Checkbox(100, 400, 20, 20);
