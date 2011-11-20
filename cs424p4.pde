@@ -45,6 +45,11 @@ void setup()
   });
   rootView.subviews.add(testB);
   
+  TextField testTF = new TextField(200, 500, 150, 20);
+  rootView.subviews.add(testTF);
+  TextField testTF2 = new TextField(200, 540, 150, 20);
+  rootView.subviews.add(testTF2);
+  
   TopArtistView topArtists = new TopArtistView(20, 20, 400, 220);
   rootView.subviews.add(topArtists);  
   
