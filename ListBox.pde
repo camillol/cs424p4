@@ -1,3 +1,7 @@
+interface ListAction {
+  void itemClicked(ListBox lb, int index, Object item);
+}
+
 interface ListDataSource {
   String getText(int index);
   Object get(int index);
@@ -25,6 +29,7 @@ class ListBox extends View {
   color selFgColor = color(255);
   
   ListDataSource data;
+  ListAction action;
   int scrollPos = 0;
   
   float thumbClickPos = -1;
@@ -33,6 +38,7 @@ class ListBox extends View {
   {
     super(x_,y_,w_,h_);
     data = data_;
+    action = null;
   }
   
   int maxScroll()
@@ -106,7 +112,7 @@ class ListBox extends View {
   boolean contentClicked(float lx, float ly)
   {
     int index = constrain(int(ly/rowHeight) + scrollPos, 0, data.count()-1);
-    listClicked(this, index, data.get(index));
+    if (action != null) action.itemClicked(this, index, data.get(index));
     return true;
   }
 }

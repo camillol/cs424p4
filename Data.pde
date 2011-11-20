@@ -12,9 +12,9 @@ class Artist {
   }
 }
 
-final static int UNKNOWN = 0;
 final static int MALE = 1;
 final static int FEMALE = 2;
+final static int UNKNOWN = 4;
 final static int DONTCARE = -1;
 
 class User {
@@ -45,6 +45,13 @@ class UserFilter {
     this.ageMin = ageMin;
     this.ageMax = ageMax;
     this.country = country;
+  }
+  
+  UserFilter() {
+    gender = DONTCARE;
+    ageMin = DONTCARE;
+    ageMax = DONTCARE;
+    country = null;
   }
 }
 

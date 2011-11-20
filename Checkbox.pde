@@ -29,3 +29,20 @@ class Checkbox extends Button {
   }
 }
 
+class GlyphCheckbox extends Checkbox {
+  String glyph;
+  GlyphCheckbox(float x_, float y_, float w_, float h_, String glyph)
+  {
+    super(x_,y_,w_,h_);
+    this.glyph = glyph;
+  }
+  
+  void drawContent(float lx, float ly) {
+    super.drawContent(lx, ly);
+    if (checked) fill(0);
+    else fill(fgColor);
+    textAlign(CENTER, CENTER);
+    text(glyph, 0, 0, w, h);
+  }
+}
+

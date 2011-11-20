@@ -27,7 +27,7 @@ void setup()
   /* setup UI */
   rootView = new View(0, 0, width, height);
   
-  testCB = new Checkbox(100, 100, 20, 20);
+  testCB = new Checkbox(100, 400, 20, 20);
   testCB.setAction(new Action<Button>() {
     public void respond(Button b) {
       Checkbox cb = (Checkbox)b;
@@ -36,13 +36,16 @@ void setup()
   });
   rootView.subviews.add(testCB);
   
-  Button testB = new Button(100, 200, 120, 20, "hello");
+  Button testB = new Button(100, 500, 120, 20, "hello");
   testB.setAction(new Action<Button>() {
     public void respond(Button b) {
       println(b.title);
     }
   });
   rootView.subviews.add(testB);
+  
+  TopArtistView topArtists = new TopArtistView(20, 20, 400, 200);
+  rootView.subviews.add(topArtists);  
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {
@@ -83,10 +86,5 @@ void mouseClicked()
 void keyTyped()
 {
   if (focusView != null) focusView.keyTyped();
-}
-
-void listClicked(ListBox lb, int index, Object item)
-{
-  
 }
 
