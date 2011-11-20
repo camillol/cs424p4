@@ -11,20 +11,22 @@ class View {
     subviews = new ArrayList();
   }
   
-  void draw()
+  void draw(float px, float py)
   {
     pushMatrix();
     translate(x, y);
+    float lx = px - x;
+    float ly = py - y;
     // draw out content, then our subviews on top
-    drawContent();
+    drawContent(lx, ly);
     for (int i = 0; i < subviews.size(); i++) {
       View v = (View)subviews.get(i);
-      v.draw();
+      v.draw(lx, ly);
     }
     popMatrix();
   }
   
-  void drawContent()
+  void drawContent(float lx, float ly)
   {
     // override this
     // when this is called, the coordinate system is local to the view,
@@ -60,17 +62,19 @@ class View {
     return px >= rx && px <= rx+rw && py >= ry && py <= ry+rh;
   }
 
-  boolean mousePressed(float px, float py)
+  View mousePressed(float px, float py)
   {
-    if (!ptInRect(px, py, x, y, w, h)) return false;
+    if (!ptInRect(px, py, x, y, w, h)) return null;
     float lx = px - x;
     float ly = py - y;
     // check our subviews first
     for (int i = subviews.size()-1; i >= 0; i--) {
       View v = (View)subviews.get(i);
-      if (v.mousePressed(lx, ly)) return true;
+      View tv = v.mousePressed(lx, ly);
+      if (tv != null) return tv;
     }
-    return contentPressed(lx, ly);
+    if (contentPressed(lx, ly)) return this;
+    else return null;
   }
 
   boolean mouseDragged(float px, float py)
@@ -110,6 +114,10 @@ class View {
       if (v.mouseWheel(lx, ly, delta)) return true;
     }
     return contentMouseWheel(lx, ly, delta);
+  }
+  
+  void keyTyped()
+  {
   }
 }
 

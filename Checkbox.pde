@@ -1,15 +1,14 @@
-class CheckBox extends View {
+class Checkbox extends Button {
   boolean checked = false;
-  color fgColor = 255;
   
   final static int INSET = 3;
   
-  CheckBox(float x_, float y_, float w_, float h_)
+  Checkbox(float x_, float y_, float w_, float h_)
   {
-    super(x_,y_,w_,h_);
+    super(x_,y_,w_,h_,"");
   }
   
-  void drawContent()
+  void drawContent(float lx, float ly)
   {
     strokeWeight(1);
     stroke(fgColor);
@@ -25,7 +24,7 @@ class CheckBox extends View {
   boolean contentClicked(float lx, float ly)
   {
     checked = !checked;
-    buttonClicked(this);
+    super.contentClicked(lx,ly);
     return true;
   }
 }

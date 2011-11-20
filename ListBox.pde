@@ -45,7 +45,7 @@ class ListBox extends View {
     scrollPos = min(max(index, 0), maxScroll());
   }
 
-  void drawContent()
+  void drawContent(float lx, float ly)
   {
     strokeWeight(1);
     stroke(fgColor);

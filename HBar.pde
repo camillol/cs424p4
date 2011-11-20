@@ -7,7 +7,7 @@ class HBar extends View {
     level = 0.5;
   }
   
-  void drawContent()
+  void drawContent(float lx, float ly)
   {
     noFill();
     stroke(0);
