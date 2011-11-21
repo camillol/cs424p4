@@ -73,6 +73,27 @@ class CountryChooser extends Button implements ListDataSource {
   }
 }
 
+class TopArtistsTable extends TableView {
+  TopArtistsTable(float x_, float y_, float w_, float h_, List<TableColumn> columns, TableDataSource data) {
+    super(x_, y_, w_, h_, columns, data);
+  }
+  
+  void drawCell(int i, int j, TableColumn col, float colx)
+  {
+    if (j == 1) {
+      ArtistChartEntry topA = (ArtistChartEntry)data.get(0);
+      ArtistChartEntry thisA = (ArtistChartEntry)data.get(i);
+      if (thisA != null) {
+        float barw = (float)col.w * thisA.playCount / topA.playCount;
+        fill(64);
+        rect(colx + col.w - barw, 0, barw, rowHeight);
+        fill(textColor);
+      }
+    }
+    super.drawCell(i, j, col, colx);
+  }
+}
+
 class TopArtistView extends View implements TableDataSource {
   UserFilter userFilter;
   GlyphCheckbox maleCB;
@@ -93,7 +114,7 @@ class TopArtistView extends View implements TableDataSource {
     super(x_,y_,w_,h_);
     this.userFilter = initialFilter;
     
-    artistTable = new TableView(0, 40, w, h-40, Arrays.asList(
+    artistTable = new TopArtistsTable(0, 40, w, h-40, Arrays.asList(
       new TableColumn("Artist", w*0.8),
       new TableColumn("Plays", w*0.2, RIGHT)
     ), this); // new MissingListDataSource("no artists")
