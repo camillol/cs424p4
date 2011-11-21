@@ -1,9 +1,49 @@
 import java.util.*;
 
 class ArtistDetailView extends View {
+  class ArtistInfo implements TableDataSource{
+      Artist artist;
+      ArtistInfo(Artist artist){
+        this.artist = artist;
+      }
+      String getText(int index, int column){
+        fill(255);
+        if(index == 0){
+          if(column==0){
+            return "User count";
+          }
+          else{
+            return "" + artist.getUserCount();
+          }
+        }
+         if(index == 1){
+          if(column==0){
+            return "Song count";
+          }
+          else{
+            int song_count = artist.getSongCount();
+            if(song_count == 0)
+              return "Not Available";
+            else
+              return "" + song_count;
+          }
+        }
+        return "TEST";
+      }
+      Object get(int index){
+        return new Object();
+      }
+      int count(){
+        return 10;
+      }
+      boolean selected(int index){
+        return false;
+      }
+  }
   
   int ROW_1 = 50;
   int ROW_2 = 100;
+  int ROW_3 = 400;
   int COLUMN_1 = 20;
   int COLUMN_2 = 400;
   
@@ -22,6 +62,10 @@ class ArtistDetailView extends View {
       image_url = image_urls.get(0);
     artist_image = loadImage(image_url, "jpg");
     createChartPopularityByAge();
+    
+    TableView artist_info = new TableView(COLUMN_1, ROW_3, 400, 200, Arrays.asList(
+      new TableColumn("Fact", 100), new TableColumn("Value", 100)), new ArtistInfo(artist));
+    this.subviews.add(artist_info);
     
   }
   

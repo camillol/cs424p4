@@ -8,7 +8,9 @@ class Artist {
   String name;
   
   ArrayList<ArtistGenderBreakdown> gender_breakdown;
-  public int user_count=0;
+  public int user_count=0,song_count=0;
+  
+  public boolean user_count_set = false, song_count_set=false;
   Artist(int id, String mbid, String name) {
     this.id = id;
     this.mbid = mbid;
@@ -17,10 +19,43 @@ class Artist {
   
   ArrayList<String> getImageUrls(){
     return LastFmWrapper.getImageUrls(name);
-    
+  }
+  
+  int getSongCount(){
+    if(!song_count_set){
+      String request = host + "artists/" + id + "/songs.json";
+      println(request);
+      try {
+        JSONArray result = new JSONArray(join(loadStrings(request), ""));
+        song_count = result.length();
+        song_count_set = true;
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    return song_count;
+  }
+
+  int getUserCount(){
+    if(!user_count_set){
+      String request = host + "artists/" + id + "/users.json";
+      println(request);
+      try {
+        JSONArray result = new JSONArray(join(loadStrings(request), ""));
+        user_count = result.length();
+        user_count_set = true;
+        
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    return user_count;
   }
 
   ArrayList<ArtistGenderBreakdown> getGenderBreakdown(){
+    user_count = 0;
     if(gender_breakdown == null){
       gender_breakdown = new ArrayList<ArtistGenderBreakdown>();
       String request = host + "artists/" + id + "/users/gender_stats.json";
@@ -47,6 +82,7 @@ class Artist {
         println (e);
       }
     }
+    user_count_set = true;
     return gender_breakdown;
   }
 }
