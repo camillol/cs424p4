@@ -1,14 +1,15 @@
 import org.json.*;
+import java.util.concurrent.*;
 
 class Artist {
-  String name;
   int id;
-  String ref;
+  String mbid;
+  String name;
   
-  Artist(int id, String ref, String name) {
-    this.name = name;
+  Artist(int id, String mbid, String name) {
     this.id = id;
-    this.ref = ref;
+    this.mbid = mbid;
+    this.name = name;
   }
 }
 
@@ -106,27 +107,48 @@ class Song {
 
 class ArtistChartEntry {
   Artist artist;
-  int userCount;
+  int playCount;
   
-  ArtistChartEntry(Artist artist, int userCount) {
+  ArtistChartEntry(Artist artist, int playCount) {
     this.artist = artist;
-    this.userCount = userCount;
+    this.playCount = playCount;
   }
 }
 
 class WebDataSource {
   String baseURL;
+  ExecutorService loadExec;
   
   WebDataSource(String baseURL)
   {
     this.baseURL = baseURL;
+    loadExec = Executors.newSingleThreadExecutor();
   }
   
-/*  List<ArtistChartEntry> getTopArtists(UserFilter userFilter)
+  Future<List<ArtistChartEntry>> getTopArtists(final UserFilter userFilter)
   {
-    
-  }*/
+    return loadExec.submit(new Callable<List<ArtistChartEntry>>() {
+      public List<ArtistChartEntry> call() {
+        List<ArtistChartEntry> entries = new ArrayList<ArtistChartEntry>(10);
+        String request = baseURL + "top_artists" + userFilter.queryString();
+        println(request);
+        try {
+          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          for (int i = 0; i < result.length(); i++) {
+            JSONObject aj = result.getJSONObject(i);
+            Artist artist = new Artist(aj.getInt("id"), aj.getString("mbid"), aj.getString("name"));
+            entries.add(new ArtistChartEntry(artist, aj.getInt("plays")));
+          }
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return entries;
+      }
+    });
+  }
 }
+
 class mbArtist{
   String name;
   String begin;
@@ -138,6 +160,7 @@ class mbArtist{
   }
   
 }
+
  mbArtist mbidtoArtist(String mbid){
      XMLElement xml;
     String testentry = "b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d";
@@ -148,4 +171,3 @@ class mbArtist{
                     xml.getChild(0).getChild(3).getChild(0).getContent(), 
                     xml.getChild(0).getChild(3).getChild(1).getContent());
 }
-
