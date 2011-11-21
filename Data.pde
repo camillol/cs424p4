@@ -160,7 +160,13 @@ class mbArtist{
   }
   
 }
+String songtoMbid(String song){
+  XMLElement xml;
+  String request = "http://musicbrainz.org/ws/2/recording/?query=" + song;
+  xml = new XMLElement(this, request);
+  return xml.getChild(0).getChild(0).getString("id");
 
+}
  mbArtist mbidtoArtist(String mbid){
      XMLElement xml;
     String testentry = "b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d";
