@@ -15,6 +15,8 @@ Checkbox testCB;
 
 PFont font;
 
+TabView mainTabView;
+
 void setup()
 {
   size(1024, 768);
@@ -34,8 +36,13 @@ void setup()
   
   rootView = new View(0, 0, width, height);
   
+  mainTabView = new TabView(10, 10, width-20, height-20, Arrays.asList("Top Artists", "Artist Details", "Map Test"));
+  rootView.subviews.add(mainTabView);
+  
+  View topArtistsPane = mainTabView.tabs.get(0).pane;
+  
   TopArtistView topArtistsA = new TopArtistView(20, 20, 460, 240, new UserFilter());
-  rootView.subviews.add(topArtistsA);  
+  topArtistsPane.subviews.add(topArtistsA);  
 
   UserFilter demoFilter = new UserFilter();
   demoFilter.country = data.getCountryNamed("United States");
@@ -43,7 +50,15 @@ void setup()
   demoFilter.ageMax = 30;
   demoFilter.gender = FEMALE;
   TopArtistView topArtistsB = new TopArtistView(20, 300, 460, 240, demoFilter);
-  rootView.subviews.add(topArtistsB);  
+  topArtistsPane.subviews.add(topArtistsB); 
+
+  View artistDetailPane = mainTabView.tabs.get(1).pane;
+  /* Eugine, add artist detail views to artistDetailPane.subviews */
+  
+  View mapTestPane = mainTabView.tabs.get(2).pane;
+
+  MapView mapView = new MapView(100,100,400,300);
+  mapTestPane.subviews.add(mapView); 
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {
@@ -51,9 +66,6 @@ void setup()
       rootView.mouseWheel(mouseX, mouseY, evt.getWheelRotation());
     }
   });
-  
-  MapView mapView = new MapView(100,100,400,300);
-  rootView.subviews.add(mapView);
   
 //  mbidtoArtist("b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d");
 }
