@@ -74,6 +74,7 @@ class ArtistDetailView extends View {
     fill(200);
     textSize(40);
     text(artist.name, COLUMN_1,ROW_1);
+    textSize(normalFontSize);
   }
   
   void drawImage(){ 

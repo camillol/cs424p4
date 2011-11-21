@@ -42,5 +42,6 @@ class PieChart extends View{
       lastAngle += radians(angle);
       i++;
     }
+    textSize(normalFontSize);
   }
 }

@@ -12,10 +12,11 @@ color borderColor = 128;
 WebDataSource data;
 
 Checkbox testCB;
- String host = "http://localhost:3000/"; 
-//String host = ("http://radiogaga.heroku.com/");
+// String host = "http://localhost:3000/"; 
+String host = "http://radiogaga.heroku.com/";
 
 PFont font;
+int normalFontSize;
 
 TabView mainTabView;
 
@@ -33,35 +34,11 @@ void setup()
   
   /* setup UI */
   font = loadFont("Helvetica-14.vlw");
+  normalFontSize = 14;
   textFont(font);
+  textSize(normalFontSize);
   
   rootView = new View(0, 0, width, height);
-  
-
-  testCB = new Checkbox(100, 400, 20, 20);
-  testCB.setAction(new Action<Button>() {
-    public void respond(Button b) {
-      Checkbox cb = (Checkbox)b;
-      println(cb.checked);
-    }
-  });
-  //rootView.subviews.add(testCB);
-
-  
-  Button testB = new Button(100, 500, 120, 20, "hello");
-  testB.setAction(new Action<Button>() {
-    public void respond(Button b) {
-      println(b.title);
-    }
-  });
-  //rootView.subviews.add(testB);
-  
-  TextField testTF = new TextField(200, 500, 150, 20);
-  //rootView.subviews.add(testTF);
-  TextField testTF2 = new TextField(200, 540, 150, 20);
-  //rootView.subviews.add(testTF2);
-  
-
   
   mainTabView = new TabView(10, 10, width-20, height-20, Arrays.asList("Top Artists", "Artist Details", "Map Test"));
   rootView.subviews.add(mainTabView);
@@ -82,6 +59,9 @@ void setup()
 
   View artistDetailPane = mainTabView.tabs.get(1).pane;
   /* Eugine, add artist detail views to artistDetailPane.subviews */
+  Artist artist = new Artist(4112, "f59c5520-5f46-4d2c-b2c4-822eabf53419", "Eminem");
+  ArtistDetailView artistDetailView = new ArtistDetailView(0,0,width,height, artist);
+  artistDetailPane.subviews.add(artistDetailView);
   
   View mapTestPane = mainTabView.tabs.get(2).pane;
 
@@ -106,9 +86,6 @@ void setup()
   });
   
 //  mbidtoArtist("b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d");
-  Artist artist = new Artist(4112, "f59c5520-5f46-4d2c-b2c4-822eabf53419", "Eminem");
-  ArtistDetailView artistDetailView = new ArtistDetailView(0,0,width,height, artist);
-  rootView.subviews.add(artistDetailView);
 }
 
 void draw()
