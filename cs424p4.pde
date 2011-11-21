@@ -43,7 +43,7 @@ void setup()
   //rootView.subviews.add(testCB);
   Artist artist = new Artist(4112, "f59c5520-5f46-4d2c-b2c4-822eabf53419", "Eminem");
   ArtistDetailView artistDetailView = new ArtistDetailView(0,0,width,height, artist);
-  rootView.subviews.add(artistDetailView);
+  //rootView.subviews.add(artistDetailView);
   
   Button testB = new Button(100, 500, 120, 20, "hello");
   testB.setAction(new Action<Button>() {
