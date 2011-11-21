@@ -16,6 +16,7 @@ class CountryChooser extends Button implements ListDataSource {
   boolean showing = false;
   int chosen = 0;
   ListBox countryListbox;
+  List<Country> countries;
   
   CountryChooser(float x_, float y_, float w_, float h_)
   {
@@ -36,6 +37,7 @@ class CountryChooser extends Button implements ListDataSource {
   {
     showing = !showing;
     if (showing) {
+      countries = data.getCountries();  /* if it failed to load, we only want to retry when the menu is reopened */
       countryListbox.x = mouseX - lx;
       countryListbox.y = mouseY - ly + h;
       rootView.subviews.add(countryListbox);
@@ -45,15 +47,15 @@ class CountryChooser extends Button implements ListDataSource {
   
   String getText(int index) {
     if (index == 0) return "Any country";
-    else return data.countries.get(index - 1).name;
+    else return countries.get(index - 1).name;
   }
   Object get(int index) {
     if (index == 0) return null;
-    else return data.countries.get(index - 1);
+    else return countries.get(index - 1);
   }
   int count() {
     try {
-      return data.getCountries().size() + 1;
+      return countries.size() + 1;
     }
     catch (NullPointerException e) {
       return 1;

@@ -134,6 +134,7 @@ class WebDataSource {
   {
     try {
       InputStream is = createInput(request);
+      if (is == null) return null;
       BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
       StringBuffer buf = new StringBuffer();
       String line = null;
@@ -164,6 +165,9 @@ class WebDataSource {
       }
       catch (JSONException e) {
         println (e);
+      }
+      catch (NullPointerException e) {
+        
       }
     }
     return countries;

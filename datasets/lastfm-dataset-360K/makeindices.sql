@@ -44,3 +44,15 @@ create index top_artists2_no_age_artist_id_idx on top_artists2_no_age(artist_id)
 cluster top_artists2_no_age_artist_id_idx on top_artists2_no_age;
 
 alter table countries2 rename to countries;
+
+
+create table top_artists2_no_age_no_country as
+select artist_id, gender, sum(plays) as plays from top_artists2_no_age
+group by artist_id, gender
+order by artist_id;
+
+create index top_artists2_no_age_no_country_artist_id_idx on top_artists2_no_age_no_country(artist_id);
+cluster top_artists2_no_age_no_country_artist_id_idx on top_artists2_no_age_no_country;
+
+
+create index top_artists2_age_country_id_idx on top_artists2(age,country_id);

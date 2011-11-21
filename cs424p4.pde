@@ -24,7 +24,7 @@ void setup()
   smooth();
 
   /* load data */
-  if (true) data = new WebDataSource("http://localhost:3000/");
+  if (false) data = new WebDataSource("http://localhost:3000/");
   else data = new WebDataSource("http://radiogaga.heroku.com/");
   
   /* setup UI */
