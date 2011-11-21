@@ -33,30 +33,15 @@ void setup()
   
   rootView = new View(0, 0, width, height);
   
-  testCB = new Checkbox(100, 400, 20, 20);
-  testCB.setAction(new Action<Button>() {
-    public void respond(Button b) {
-      Checkbox cb = (Checkbox)b;
-      println(cb.checked);
-    }
-  });
-  rootView.subviews.add(testCB);
-  
-  Button testB = new Button(100, 500, 120, 20, "hello");
-  testB.setAction(new Action<Button>() {
-    public void respond(Button b) {
-      println(b.title);
-    }
-  });
-  rootView.subviews.add(testB);
-  
-  TextField testTF = new TextField(200, 500, 150, 20);
-  rootView.subviews.add(testTF);
-  TextField testTF2 = new TextField(200, 540, 150, 20);
-  rootView.subviews.add(testTF2);
-  
-  TopArtistView topArtists = new TopArtistView(20, 20, 460, 220);
-  rootView.subviews.add(topArtists);  
+  TopArtistView topArtistsA = new TopArtistView(20, 20, 460, 220, new UserFilter());
+  rootView.subviews.add(topArtistsA);  
+
+  UserFilter demoFilter = new UserFilter();
+  demoFilter.country = data.getCountryNamed("United States");
+  demoFilter.ageMin = 20;
+  demoFilter.ageMax = 30;
+  TopArtistView topArtistsB = new TopArtistView(20, 280, 460, 220, demoFilter);
+  rootView.subviews.add(topArtistsB);  
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {
