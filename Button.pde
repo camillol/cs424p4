@@ -6,6 +6,8 @@ class Button extends View {
   color fgColor = 255;
   String title;
   Action<Button> action = null;
+  int align = CENTER;
+  final static int MARGIN = 4;
   
   Button(float x_, float y_, float w_, float h_, String title)
   {
@@ -30,8 +32,8 @@ class Button extends View {
     rect(0, 0, w, h);
     
     fill(fgColor);
-    textAlign(CENTER, CENTER);
-    text(title, w/2, h/2);
+    textAlign(align, CENTER);
+    text(title, MARGIN, 0, w-MARGIN, h);
   }
   
   boolean contentClicked(float lx, float ly)

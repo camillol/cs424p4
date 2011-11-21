@@ -12,6 +12,9 @@ WebDataSource data;
 
 Checkbox testCB;
 String host = "http://localhost:3000/"; //("http://radiogaga.heroku.com/");
+
+PFont font;
+
 void setup()
 {
   size(1024, 768);
@@ -25,6 +28,9 @@ void setup()
   data = new WebDataSource(host);
   
   /* setup UI */
+  font = loadFont("Helvetica-14.vlw");
+  textFont(font);
+  
   rootView = new View(0, 0, width, height);
   
   testCB = new Checkbox(100, 400, 20, 20);
@@ -47,8 +53,13 @@ void setup()
   });
   //rootView.subviews.add(testB);
   
-  TopArtistView topArtists = new TopArtistView(20, 20, 400, 220);
-  //rootView.subviews.add(topArtists);  
+  TextField testTF = new TextField(200, 500, 150, 20);
+  rootView.subviews.add(testTF);
+  TextField testTF2 = new TextField(200, 540, 150, 20);
+  rootView.subviews.add(testTF2);
+  
+  TopArtistView topArtists = new TopArtistView(20, 20, 460, 220);
+  rootView.subviews.add(topArtists);  
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {
@@ -56,6 +67,8 @@ void setup()
       rootView.mouseWheel(mouseX, mouseY, evt.getWheelRotation());
     }
   });
+  
+//  mbidtoArtist("b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d");
 }
 
 void draw()

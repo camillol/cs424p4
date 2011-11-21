@@ -1,25 +1,31 @@
-interface ListAction {
-  void itemClicked(ListBox lb, int index, Object item);
+interface TableAction {
+  void itemClicked(TableView tv, int index, Object item);
 }
 
-interface ListDataSource {
-  String getText(int index);
+interface TableDataSource {
+  String getText(int index, int column);
   Object get(int index);
   int count();
   boolean selected(int index);
 }
 
-class MissingListDataSource implements ListDataSource {
-  String msg;
+class TableColumn {
+  String label;
+  float w;
+  int align;
   
-  MissingListDataSource(String msg_) { msg = msg_; }
-  String getText(int index) { return msg; }
-  Object get(int index) { return null; }
-  int count() { return 1; }
-  boolean selected(int index) { return false; }
+  TableColumn(String label, float w, int align) {
+    this.label = label;
+    this.w = w;
+    this.align = align;
+  }
+  
+  TableColumn(String label, float w) {
+    this(label, w, LEFT);
+  }
 }
 
-class ListBox extends View {
+class TableView extends View {
   final int rowHeight = 20;
   final int barSize = 14;
   
@@ -28,22 +34,21 @@ class ListBox extends View {
   color selBgColor = color(128);
   color selFgColor = color(255);
   
-  ListDataSource data;
-  ListAction action;
+  List<TableColumn> columns;
+  TableDataSource data;
+  TableAction action;
   int scrollPos = 0;
   
   float thumbClickPos = -1;
   
-  ListBox(float x_, float y_, float w_, float h_, ListDataSource data_)
+  final static int MARGIN = 8;
+  
+  TableView(float x_, float y_, float w_, float h_, List<TableColumn> columns, TableDataSource data)
   {
     super(x_,y_,w_,h_);
-    data = data_;
+    this.columns = columns;
+    this.data = data;
     action = null;
-  }
-  
-  void setAction(ListAction action)
-  {
-    this.action = action;
   }
   
   int maxScroll()
@@ -67,14 +72,10 @@ class ListBox extends View {
     textAlign(LEFT, CENTER);
     for(int i = scrollPos; i < scrollPos + (h/rowHeight) && i < data.count(); i++) {
       float rowy = (i-scrollPos) * rowHeight;
-      if (data.selected(i)) {
-        fill(selBgColor);
-        rect(0, rowy, w, rowHeight);
-        fill(selFgColor);
-      } else {
-        fill(fgColor);
-      }
-      text(data.getText(i), 8, rowy, w-8, rowHeight);
+      pushMatrix();
+      translate(0, rowy);
+      drawRow(i);
+      popMatrix();
     }
     
     if (maxScroll() > 0) {
@@ -91,6 +92,25 @@ class ListBox extends View {
       rect(0, thumbY, barSize, thumbH);
       
       popMatrix();
+    }
+  }
+  
+  void drawRow(int i)
+  {
+    if (data.selected(i)) {
+      fill(selBgColor);
+      rect(0, 0, w, rowHeight);
+      fill(selFgColor);
+    } else {
+      fill(fgColor);
+    }
+    
+    float colx = 0;
+    for (int j = 0; j < columns.size(); j++) {
+      TableColumn col = columns.get(j);
+      textAlign(col.align, CENTER);
+      text(data.getText(i, j), colx + MARGIN, 0, col.w - MARGIN*2, rowHeight);
+      colx += col.w;
     }
   }
   

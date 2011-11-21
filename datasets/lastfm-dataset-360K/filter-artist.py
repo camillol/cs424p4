@@ -5,10 +5,10 @@
 from collections import defaultdict
 
 def write_artist(artf, multif, art_id, art_mbid, art_names):
-	_, name = max((v,k) for k,v in art_names.items())
 	if len(art_names) > 1:
 		for name, count in art_names.items():
 			multif.write("%d\t%d\t%s\n" % (art_id, count, name))
+	_, name = max((v,k) for k,v in art_names.items())
 	artf.write("%d\t%s\t%s\n" % (art_id, art_mbid, name))
 
 def filter_favorite_artists():
