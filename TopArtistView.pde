@@ -23,14 +23,20 @@ class CountryChooser extends Button implements ListDataSource {
     super(x_,y_,w_,h_,"");
     title = getText(chosen);
     align = LEFT;
+    countries = data.getCountries();
     countryListbox = new ListBox(x_, y_+h_, w_, 200, this);
     countryListbox.setAction(new ListAction() {
       public void itemClicked(ListBox lb, int index, Object item) {
-        chosen = index;
-        title = getText(chosen);
+        setChosen(index);
         if (action != null) action.respond(CountryChooser.this);
       }
     });
+  }
+  
+  void setChosen(int index)
+  {
+    chosen = index;
+    title = getText(chosen);
   }
   
   boolean contentClicked(float lx, float ly)
@@ -82,10 +88,10 @@ class TopArtistView extends View implements TableDataSource {
   final static int GENDER_LABEL_WIDTH = 40;
   final static int AGE_LABEL_WIDTH = 50;
   
-  TopArtistView(float x_, float y_, float w_, float h_)
+  TopArtistView(float x_, float y_, float w_, float h_, UserFilter initialFilter)
   {
     super(x_,y_,w_,h_);
-    userFilter = new UserFilter();
+    this.userFilter = initialFilter;
     
     HorizontalLayout layout = new HorizontalLayout(this);
     
@@ -114,8 +120,14 @@ class TopArtistView extends View implements TableDataSource {
       }
     });
     
+    if (userFilter.ageMin != DONTCARE) ageFromField.value = str(userFilter.ageMin);
+    if (userFilter.ageMax != DONTCARE) ageToField.value = str(userFilter.ageMax);
+    
     layout.add(new Label(0, 0, 90, 20, "Country:", RIGHT));
     layout.add(countryChooser = new CountryChooser(0, 0, 120, 20));
+    if (userFilter.country != null) {
+      countryChooser.setChosen(data.countries.indexOf(userFilter.country) + 1);
+    }
     countryChooser.setAction(new Action<Button>() {
       public void respond(Button b) {
         userFilter.country = (Country)countryChooser.get(countryChooser.chosen);
@@ -128,11 +140,12 @@ class TopArtistView extends View implements TableDataSource {
 
     reloadArtists();
     
-    artistTable = new TableView(0, 20, w, h-2, Arrays.asList(
+    artistTable = new TableView(0, 40, w, h-40, Arrays.asList(
       new TableColumn("Artist", w*0.8),
       new TableColumn("Plays", w*0.2, RIGHT)
     ), this); // new MissingListDataSource("no artists")
     subviews.add(artistTable);
+    subviews.add(new TableHeader(0, 20, w, 20, artistTable));
   }
   
   int stringToAge(String s)

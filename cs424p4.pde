@@ -60,6 +60,16 @@ void setup()
   
   TopArtistView topArtists = new TopArtistView(20, 20, 460, 220);
   rootView.subviews.add(topArtists);  
+  TopArtistView topArtistsA = new TopArtistView(20, 20, 460, 240, new UserFilter());
+  rootView.subviews.add(topArtistsA);  
+
+  UserFilter demoFilter = new UserFilter();
+  demoFilter.country = data.getCountryNamed("United States");
+  demoFilter.ageMin = 20;
+  demoFilter.ageMax = 30;
+  demoFilter.gender = FEMALE;
+  TopArtistView topArtistsB = new TopArtistView(20, 300, 460, 240, demoFilter);
+  rootView.subviews.add(topArtistsB);  
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {

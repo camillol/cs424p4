@@ -232,6 +232,14 @@ class WebDataSource {
     return countries;
   }
   
+  Country getCountryNamed(String name)
+  {
+    for (Country c : getCountries()) {
+      if (c.name.equalsIgnoreCase(name)) return c;
+    }
+    return null;
+  }
+  
   Future<List<ArtistChartEntry>> getTopArtists(final UserFilter userFilter)
   {
     return loadExec.submit(new Callable<List<ArtistChartEntry>>() {
