@@ -7,6 +7,7 @@ PApplet papplet;
 
 color backgroundColor = 0;
 color textColor = 255;
+color borderColor = 128;
 
 WebDataSource data;
 
@@ -15,6 +16,8 @@ Checkbox testCB;
 //String host = ("http://radiogaga.heroku.com/");
 
 PFont font;
+
+TabView mainTabView;
 
 void setup()
 {
@@ -34,6 +37,7 @@ void setup()
   
   rootView = new View(0, 0, width, height);
   
+<<<<<<< HEAD
   testCB = new Checkbox(100, 400, 20, 20);
   testCB.setAction(new Action<Button>() {
     public void respond(Button b) {
@@ -61,6 +65,13 @@ void setup()
 
   TopArtistView topArtistsA = new TopArtistView(20, 20, 460, 240, new UserFilter());
   //rootView.subviews.add(topArtistsA);  
+  mainTabView = new TabView(10, 10, width-20, height-20, Arrays.asList("Top Artists", "Artist Details", "Map Test"));
+  rootView.subviews.add(mainTabView);
+  
+  View topArtistsPane = mainTabView.tabs.get(0).pane;
+  
+  TopArtistView topArtistsA = new TopArtistView(20, 20, 460, 240, new UserFilter());
+  topArtistsPane.subviews.add(topArtistsA);  
 
   UserFilter demoFilter = new UserFilter();
   demoFilter.country = data.getCountryNamed("United States");
@@ -69,6 +80,25 @@ void setup()
   demoFilter.gender = FEMALE;
   TopArtistView topArtistsB = new TopArtistView(20, 300, 460, 240, demoFilter);
   //rootView.subviews.add(topArtistsB);  
+  topArtistsPane.subviews.add(topArtistsB); 
+
+  View artistDetailPane = mainTabView.tabs.get(1).pane;
+  /* Eugine, add artist detail views to artistDetailPane.subviews */
+  
+  View mapTestPane = mainTabView.tabs.get(2).pane;
+
+  MapView mapView = new MapView(100,100,400,300) {
+    public void drawCountry(PShape cShape, String cc) {
+      Country c = data.getCountryByCode(cc);
+      if (c != null) {
+        fill(lerpColor(#ffffff, #ff0000, 1.0*c.plays/853502673));
+      } else {
+        fill(#eeeeee);
+      }
+      super.drawCountry(cShape, cc);
+    }
+  };
+  mapTestPane.subviews.add(mapView); 
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {

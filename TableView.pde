@@ -36,7 +36,7 @@ class TableHeader extends View {
   void drawContent(float lx, float ly)
   {
     strokeWeight(1);
-    stroke(tableView.fgColor);
+    stroke(borderColor);
     fill(tableView.bgColor);
     rect(0,0,w,h);
     noStroke();
@@ -92,7 +92,7 @@ class TableView extends View {
   void drawContent(float lx, float ly)
   {
     strokeWeight(1);
-    stroke(fgColor);
+    stroke(borderColor);
     fill(bgColor);
     rect(0,0,w,h);
     noStroke();
@@ -136,10 +136,15 @@ class TableView extends View {
     float colx = 0;
     for (int j = 0; j < columns.size(); j++) {
       TableColumn col = columns.get(j);
-      textAlign(col.align, CENTER);
-      text(data.getText(i, j), colx + MARGIN, 0, col.w - MARGIN*2, rowHeight);
+      drawCell(i, j, col, colx);
       colx += col.w;
     }
+  }
+  
+  void drawCell(int i, int j, TableColumn col, float colx)
+  {
+    textAlign(col.align, CENTER);
+    text(data.getText(i, j), colx + MARGIN, 0, col.w - MARGIN*2, rowHeight);
   }
   
   boolean contentPressed(float lx, float ly)

@@ -56,3 +56,13 @@ cluster top_artists2_no_age_no_country_artist_id_idx on top_artists2_no_age_no_c
 
 
 create index top_artists2_age_country_id_idx on top_artists2(age,country_id);
+
+
+alter table countries add column code char(2);
+create unique index countries_code_idx on countries(code);
+
+alter table countries add column plays integer;
+update countries set plays = total
+from (select country_id, sum(plays) as total from top_artists2_no_age group by country_id) ct
+where ct.country_id = id;
+
