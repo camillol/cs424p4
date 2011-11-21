@@ -1,14 +1,52 @@
 import org.json.*;
+import java.util.*;
 
 class Artist {
   int id;
   String mbid;
   String name;
   
+  ArrayList<ArtistGenderBreakdown> gender_breakdown;
+  public int user_count=0;
   Artist(int id, String mbid, String name) {
     this.id = id;
     this.mbid = mbid;
     this.name = name;
+  }
+  
+  ArrayList<String> getImageUrls(){
+    return LastFmWrapper.getImageUrls(name);
+    
+  }
+
+  ArrayList<ArtistGenderBreakdown> getGenderBreakdown(){
+    if(gender_breakdown == null){
+      gender_breakdown = new ArrayList<ArtistGenderBreakdown>();
+      String request = host + "artists/" + id + "/users/gender_stats.json";
+      println(request);
+      try {
+        JSONArray result = new JSONArray(join(loadStrings(request), ""));
+        for (int i = 0; i < result.length(); i++){
+          JSONObject aj = result.getJSONObject(i);
+          String gender = aj.getString("gender");
+          int count = aj.getInt("count");
+          user_count+=count;
+          if(gender.equals("null")){
+            gender_breakdown.add(new ArtistGenderBreakdown(UNKNOWN, count));
+          }
+          else if(gender.equals("m")){
+            gender_breakdown.add(new ArtistGenderBreakdown(MALE, count));
+          }
+          else if(gender.equals("f")){
+            gender_breakdown.add(new ArtistGenderBreakdown(FEMALE, count));
+          }
+        }
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    return gender_breakdown;
   }
 }
 
@@ -16,6 +54,16 @@ final static int MALE = 1;
 final static int FEMALE = 2;
 final static int UNKNOWN = 4;
 final static int DONTCARE = -1;
+
+public String getGenderName(int gender){
+  switch(gender){
+    case MALE: return "Male";
+    case FEMALE: return "Female";
+    case UNKNOWN: return "Unknown";
+    case DONTCARE: return "Don't care";
+    default: return "";
+  }
+}
 
 class User {
   String name;
@@ -89,6 +137,8 @@ class Song {
   }
 }
 
+
+
 class ArtistChartEntry {
   Artist artist;
   int playCount;
@@ -96,6 +146,15 @@ class ArtistChartEntry {
   ArtistChartEntry(Artist artist, int playCount) {
     this.artist = artist;
     this.playCount = playCount;
+  }
+}
+
+class ArtistGenderBreakdown{
+  public int gender;
+  public int count;
+  ArtistGenderBreakdown(int gender, int count){
+    this.gender = gender;
+    this.count = count;
   }
 }
 

@@ -1,11 +1,11 @@
 
-import java.util.Collection;
+import java.util.*;
 
 import de.umass.lastfm.Artist;
 import de.umass.lastfm.Chart;
 import de.umass.lastfm.Event;
 import de.umass.lastfm.PaginatedResult;
-import de.umass.lastfm.Track;
+import de.umass.lastfm.*;
 
 /**
  * @author zitterbewegung
@@ -25,7 +25,7 @@ public class LastFmWrapper {
 		for (Track track : topTracks.getPageResults()) {
 			returnVar = returnVar + track.getName();
 			returnVar = returnVar + Integer.toString(track.getPlaycount());
-			//System.out.printf("%s (%d plays)%n", track.getName(), track.getPlaycount());
+			System.out.printf("%s (%d plays)%n", track.getName(), track.getPlaycount());
 			}
 		return returnVar;	
 		}
@@ -45,6 +45,13 @@ public class LastFmWrapper {
 		return returnVar;
 		
 	}
+        public static ArrayList<String> getImageUrls(String artist_name){
+          ArrayList<String> images = new ArrayList<String>();
+		for(Image image : Artist.getImages(artist_name, key).getPageResults()){
+		  images.add(image.getImageURL(ImageSize.EXTRALARGE));
+}
+          return images;
+        }
 	/**
 	 * @param artist 
 	 * This parameter is a string which is the artist to get a relative
@@ -56,6 +63,7 @@ public class LastFmWrapper {
 		Collection<Artist> similarArtists = Artist.getSimilar(artist, key);
 		for (Artist artist2 : similarArtists) {
 			returnVar = returnVar + artist2.getName() + "\n";
+                        System.out.println(returnVar);
 			
 		}
 		return returnVar;
