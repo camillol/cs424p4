@@ -87,11 +87,13 @@ class Country {
   int id;
   String name;
   String code;
+  int plays;
   
-  Country(int id, String name, String code) {
+  Country(int id, String name, String code, int plays) {
     this.name = name;
     this.id = id;
     this.code = code;
+    this.plays = plays;
   }
 }
 
@@ -163,7 +165,7 @@ class WebDataSource {
         countries = new ArrayList<Country>(239);
         for (int i = 0; i < result.length(); i++) {
           JSONObject aj = result.getJSONObject(i);
-          countries.add(new Country(aj.getInt("id"), aj.getString("name"), aj.getString("code")));
+          countries.add(new Country(aj.getInt("id"), aj.getString("name"), aj.getString("code"), aj.getInt("plays")));
         }
       }
       catch (JSONException e) {

@@ -57,7 +57,17 @@ void setup()
   
   View mapTestPane = mainTabView.tabs.get(2).pane;
 
-  MapView mapView = new MapView(100,100,400,300);
+  MapView mapView = new MapView(100,100,400,300) {
+    public void drawCountry(PShape cShape, String cc) {
+      Country c = data.getCountryByCode(cc);
+      if (c != null) {
+        fill(lerpColor(#ffffff, #ff0000, 1.0*c.plays/853502673));
+      } else {
+        fill(#eeeeee);
+      }
+      super.drawCountry(cShape, cc);
+    }
+  };
   mapTestPane.subviews.add(mapView); 
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
