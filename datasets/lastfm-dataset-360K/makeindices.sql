@@ -56,3 +56,6 @@ cluster top_artists2_no_age_no_country_artist_id_idx on top_artists2_no_age_no_c
 
 
 create index top_artists2_age_country_id_idx on top_artists2(age,country_id);
+
+
+alter table countries add column code char(2);
