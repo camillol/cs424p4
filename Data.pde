@@ -133,4 +133,12 @@ class WebDataSource {
     });
   }
 }
+void mbidtoArtist(String mbid){
+    XMLElement xml;
+    String testentry = "b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d";
+    String request =  "http://musicbrainz.org/ws/2/artist/" + mbid;  
+    xml = new XMLElement(this, request);
+    println(xml.getChild(0).getChild(0).getContent());
+  }
+
 
