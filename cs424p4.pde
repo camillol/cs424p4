@@ -37,7 +37,7 @@ void setup()
   
   rootView = new View(0, 0, width, height);
   
-<<<<<<< HEAD
+
   testCB = new Checkbox(100, 400, 20, 20);
   testCB.setAction(new Action<Button>() {
     public void respond(Button b) {
@@ -62,9 +62,7 @@ void setup()
   //rootView.subviews.add(testTF2);
   
 
-
-  TopArtistView topArtistsA = new TopArtistView(20, 20, 460, 240, new UserFilter());
-  //rootView.subviews.add(topArtistsA);  
+  
   mainTabView = new TabView(10, 10, width-20, height-20, Arrays.asList("Top Artists", "Artist Details", "Map Test"));
   rootView.subviews.add(mainTabView);
   
