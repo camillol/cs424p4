@@ -122,7 +122,25 @@ class WebDataSource {
   WebDataSource(String baseURL)
   {
     this.baseURL = baseURL;
-    loadExec = Executors.newSingleThreadExecutor();
+    loadExec = Executors.newCachedThreadPool();
+  }
+  
+  String loadRequest(String request)
+  {
+    try {
+      InputStream is = createInput(request);
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+      StringBuffer buf = new StringBuffer();
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+        buf.append(line);
+      }
+      reader.close();
+      return buf.toString();
+    } catch (IOException e) {
+      println(e);
+      return null;
+    }
   }
   
   Future<List<ArtistChartEntry>> getTopArtists(final UserFilter userFilter)
@@ -132,8 +150,9 @@ class WebDataSource {
         List<ArtistChartEntry> entries = new ArrayList<ArtistChartEntry>(10);
         String request = baseURL + "top_artists" + userFilter.queryString();
         println(request);
+        
         try {
-          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          JSONArray result = new JSONArray(loadRequest(request));
           for (int i = 0; i < result.length(); i++) {
             JSONObject aj = result.getJSONObject(i);
             Artist artist = new Artist(aj.getInt("id"), aj.getString("mbid"), aj.getString("name"));

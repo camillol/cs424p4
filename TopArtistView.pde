@@ -21,6 +21,7 @@ class TopArtistView extends View implements TableDataSource {
   TextField ageToField;
   TableView artistTable;
   Future<List<ArtistChartEntry>> artists;
+  String artistsStatus;
   
   final static int GENDER_LABEL_WIDTH = 40;
   final static int AGE_LABEL_WIDTH = 50;
@@ -71,7 +72,14 @@ class TopArtistView extends View implements TableDataSource {
   
   int stringToAge(String s)
   {
-    return DONTCARE;
+    int a;
+    try {
+      a = Integer.parseInt(s);
+    }
+    catch (NumberFormatException e) {
+      a = DONTCARE;
+    }
+    return a;
   }
   
   GlyphCheckbox makeGenderCheckbox(final int flag, String letter, int x, int y)
@@ -96,7 +104,9 @@ class TopArtistView extends View implements TableDataSource {
   
   void reloadArtists()
   {
+    if (artists != null && !artists.isDone()) artists.cancel(true);
     artists = data.getTopArtists(userFilter);
+    artistsStatus = "Loading...";
   }
   
   void drawContent(float lx, float ly)
@@ -110,27 +120,29 @@ class TopArtistView extends View implements TableDataSource {
   List<ArtistChartEntry> getArtists()
   {
     List<ArtistChartEntry> a = null;
+    if (!artists.isDone()) return null;
     try {
       a = artists.get();
     } catch (InterruptedException e) {
       println(e);
     } catch (ExecutionException e) {
-      println(e);
+      artistsStatus = "Server request failed.";
     }
     return a;
   }
 
   String getText(int index, int column) {
-    if (artists.isDone()) {
-      if (column == 0) return getArtists().get(index).artist.name;
+    List<ArtistChartEntry> as = getArtists();
+    if (as != null) {
+      if (column == 0) return as.get(index).artist.name;
       else return str(getArtists().get(index).playCount);
     } else {
-      if (column == 0) return "Loading...";
+      if (column == 0) return artistsStatus;
       else return "";
     }
   }
-  Object get(int index) { return artists.isDone() ? getArtists().get(index) : null; }
-  int count() { return artists.isDone() ? getArtists().size() : 1; }
+  Object get(int index) { return getArtists() != null ? getArtists().get(index) : null; }
+  int count() { return getArtists() != null ? getArtists().size() : 1; }
   boolean selected(int index) { return false; }
 }
 
