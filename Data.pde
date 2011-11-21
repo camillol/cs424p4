@@ -111,18 +111,16 @@ class mbArtist{
     this.begin = b;
     this.end = end;
   }
-  mbArtist mbidtoArtist(String mbid){
+  
+}
+ mbArtist mbidtoArtist(String mbid){
      XMLElement xml;
     String testentry = "b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d";
     String request =  "http://musicbrainz.org/ws/2/artist/" + mbid;  
     xml = new XMLElement(super(), request);
     println(xml.getChild(0).getChild(0).getContent() +  xml.getChild(0).getChild(3).getChild(0).getContent() + xml.getChild(0).getChild(3).getChild(1).getContent());
-    mbArtist a = new mbArtist(xml.getChild(0).getChild(0).getContent(), 
+    return new mbArtist(xml.getChild(0).getChild(0).getContent(), 
                     xml.getChild(0).getChild(3).getChild(0).getContent(), 
                     xml.getChild(0).getChild(3).getChild(1).getContent());
-                    return a;
-  }
-  
 }
-
 
