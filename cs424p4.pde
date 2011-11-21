@@ -7,6 +7,7 @@ PApplet papplet;
 
 color backgroundColor = 0;
 color textColor = 255;
+color borderColor = 128;
 
 WebDataSource data;
 

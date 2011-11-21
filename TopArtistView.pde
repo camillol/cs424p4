@@ -93,6 +93,13 @@ class TopArtistView extends View implements TableDataSource {
     super(x_,y_,w_,h_);
     this.userFilter = initialFilter;
     
+    artistTable = new TableView(0, 40, w, h-40, Arrays.asList(
+      new TableColumn("Artist", w*0.8),
+      new TableColumn("Plays", w*0.2, RIGHT)
+    ), this); // new MissingListDataSource("no artists")
+    subviews.add(artistTable);
+    subviews.add(new TableHeader(0, 20, w, 20, artistTable));
+    
     HorizontalLayout layout = new HorizontalLayout(this);
     
     layout.add(new Label(0, 0, GENDER_LABEL_WIDTH,20, "Sex:", RIGHT));
@@ -139,13 +146,6 @@ class TopArtistView extends View implements TableDataSource {
 //    ageToField.value = "122";  // longest documented human life
 
     reloadArtists();
-    
-    artistTable = new TableView(0, 40, w, h-40, Arrays.asList(
-      new TableColumn("Artist", w*0.8),
-      new TableColumn("Plays", w*0.2, RIGHT)
-    ), this); // new MissingListDataSource("no artists")
-    subviews.add(artistTable);
-    subviews.add(new TableHeader(0, 20, w, 20, artistTable));
   }
   
   int stringToAge(String s)
@@ -190,7 +190,7 @@ class TopArtistView extends View implements TableDataSource {
   void drawContent(float lx, float ly)
   {
     strokeWeight(1);
-    stroke(255);
+    stroke(borderColor);
     noFill();
     rect(0, 0, w, h);
   }

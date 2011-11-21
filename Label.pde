@@ -18,11 +18,11 @@ class Label extends View {
   
   void drawContent(float lx, float ly)
   {
-    strokeWeight(1);
+/*    strokeWeight(1);
     stroke(fgColor);
     noFill();
     rect(0, 0, w, h);
-    
+    */
     textAlign(align, CENTER);
     fill(fgColor);
     text(label, MARGIN, 0, w-MARGIN*2, h);

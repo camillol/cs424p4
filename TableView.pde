@@ -36,7 +36,7 @@ class TableHeader extends View {
   void drawContent(float lx, float ly)
   {
     strokeWeight(1);
-    stroke(tableView.fgColor);
+    stroke(borderColor);
     fill(tableView.bgColor);
     rect(0,0,w,h);
     noStroke();
@@ -92,7 +92,7 @@ class TableView extends View {
   void drawContent(float lx, float ly)
   {
     strokeWeight(1);
-    stroke(fgColor);
+    stroke(borderColor);
     fill(bgColor);
     rect(0,0,w,h);
     noStroke();
