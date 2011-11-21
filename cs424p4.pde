@@ -33,14 +33,15 @@ void setup()
   
   rootView = new View(0, 0, width, height);
   
-  TopArtistView topArtistsA = new TopArtistView(20, 20, 460, 220, new UserFilter());
+  TopArtistView topArtistsA = new TopArtistView(20, 20, 460, 240, new UserFilter());
   rootView.subviews.add(topArtistsA);  
 
   UserFilter demoFilter = new UserFilter();
   demoFilter.country = data.getCountryNamed("United States");
   demoFilter.ageMin = 20;
   demoFilter.ageMax = 30;
-  TopArtistView topArtistsB = new TopArtistView(20, 280, 460, 220, demoFilter);
+  demoFilter.gender = FEMALE;
+  TopArtistView topArtistsB = new TopArtistView(20, 300, 460, 240, demoFilter);
   rootView.subviews.add(topArtistsB);  
   
   // I want to add true multitouch support, but let's have this as a stopgap for now

@@ -140,11 +140,12 @@ class TopArtistView extends View implements TableDataSource {
 
     reloadArtists();
     
-    artistTable = new TableView(0, 20, w, h-2, Arrays.asList(
+    artistTable = new TableView(0, 40, w, h-40, Arrays.asList(
       new TableColumn("Artist", w*0.8),
       new TableColumn("Plays", w*0.2, RIGHT)
     ), this); // new MissingListDataSource("no artists")
     subviews.add(artistTable);
+    subviews.add(new TableHeader(0, 20, w, 20, artistTable));
   }
   
   int stringToAge(String s)

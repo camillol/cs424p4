@@ -25,6 +25,34 @@ class TableColumn {
   }
 }
 
+class TableHeader extends View {
+  TableView tableView;
+  TableHeader(float x_, float y_, float w_, float h_, TableView tableView)
+  {
+    super(x_,y_,w_,h_);
+    this.tableView = tableView;
+  }
+  
+  void drawContent(float lx, float ly)
+  {
+    strokeWeight(1);
+    stroke(tableView.fgColor);
+    fill(tableView.bgColor);
+    rect(0,0,w,h);
+    noStroke();
+    
+    fill(tableView.fgColor);
+    
+    float colx = 0;
+    for (int j = 0; j < tableView.columns.size(); j++) {
+      TableColumn col = tableView.columns.get(j);
+      textAlign(col.align, CENTER);
+      text(col.label, colx + TableView.MARGIN, 0, col.w - TableView.MARGIN*2, h);
+      colx += col.w;
+    }
+  }
+}
+
 class TableView extends View {
   final int rowHeight = 20;
   final int barSize = 14;
