@@ -78,6 +78,18 @@ void setup()
   };
   mapTestPane.subviews.add(mapView); 
   
+  final String barLabels[] = {"one", "two", "three"};
+  final float barValues[] = {120, 435, 65};
+  final float barMax = 435;
+  final color barColors[] = {#ff0000, #00ff00, #0000ff};
+  mapTestPane.subviews.add(new BarChart(500, 200, 200, 300, new BarChartDataSource(){
+    public String getLabel(int index) { return barLabels[index]; }
+    public float getValue(int index) { return barValues[index]; }
+    public int count() { return barLabels.length; }
+    public float getMaxValue() { return barMax; }
+    public color getColor(int index) { return barColors[index % barColors.length]; }
+  }, true, true));
+  
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {
     public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
