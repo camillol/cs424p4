@@ -55,7 +55,7 @@ void setup()
   TextField testTF2 = new TextField(200, 540, 150, 20);
   rootView.subviews.add(testTF2);
   
-  TopArtistView topArtists = new TopArtistView(20, 20, 400, 220);
+  TopArtistView topArtists = new TopArtistView(20, 20, 460, 220);
   rootView.subviews.add(topArtists);  
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
@@ -65,7 +65,7 @@ void setup()
     }
   });
   
-  mbidtoArtist("b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d");
+//  mbidtoArtist("b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d");
 }
 
 void draw()

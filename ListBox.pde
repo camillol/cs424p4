@@ -41,6 +41,11 @@ class ListBox extends View {
     action = null;
   }
   
+  void setAction(ListAction action)
+  {
+    this.action = action;
+  }
+  
   int maxScroll()
   {
     return max(data.count() - int(h/rowHeight), 0);
@@ -69,7 +74,7 @@ class ListBox extends View {
       } else {
         fill(fgColor);
       }
-      text(data.getText(i), 8, rowy, w, rowHeight);
+      text(data.getText(i), 8, rowy, w-8, rowHeight);
     }
     
     if (maxScroll() > 0) {
@@ -78,7 +83,7 @@ class ListBox extends View {
       
       /* draw scrollbar */
       fill(bgColor);
-      rect(0, 0, barSize, h);
+      rect(0, 1, barSize, h-1);
       
       float thumbH = map(int(h/rowHeight), 0, data.count(), 0, h);
       float thumbY = map(scrollPos, 0, maxScroll(), 0, h-thumbH);

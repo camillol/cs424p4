@@ -65,7 +65,9 @@ class UserFilter {
     if (genderQ.length() < 3 && genderQ.length() > 0) params.add("gender=" + genderQ);
     
     if (ageMin != DONTCARE) params.add("ageMin=" + ageMin);
-    if (ageMax != DONTCARE) params.add("ageMax=" + ageMax);    
+    if (ageMax != DONTCARE) params.add("ageMax=" + ageMax);
+    
+    if (country != null) params.add("country=" + country.id);
     
     if (params.size() > 0) {
       String paramString = "?";
@@ -119,10 +121,13 @@ class WebDataSource {
   String baseURL;
   ExecutorService loadExec;
   
+  List<Country> countries;
+  
   WebDataSource(String baseURL)
   {
     this.baseURL = baseURL;
     loadExec = Executors.newCachedThreadPool();
+    getCountries();
   }
   
   String loadRequest(String request)
@@ -141,6 +146,27 @@ class WebDataSource {
       println(e);
       return null;
     }
+  }
+  
+  List<Country> getCountries()
+  {
+    if (countries == null) {
+      String request = baseURL + "countries.json";
+      println(request);
+      
+      try {
+        JSONArray result = new JSONArray(loadRequest(request));
+        countries = new ArrayList<Country>(239);
+        for (int i = 0; i < result.length(); i++) {
+          JSONObject aj = result.getJSONObject(i);
+          countries.add(new Country(aj.getInt("id"), aj.getString("name")));
+        }
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    return countries;
   }
   
   Future<List<ArtistChartEntry>> getTopArtists(final UserFilter userFilter)

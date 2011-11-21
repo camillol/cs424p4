@@ -42,3 +42,5 @@ order by artist_id;
 
 create index top_artists2_no_age_artist_id_idx on top_artists2_no_age(artist_id);
 cluster top_artists2_no_age_artist_id_idx on top_artists2_no_age;
+
+alter table countries2 rename to countries;

@@ -12,10 +12,16 @@ interface TableDataSource {
 class TableColumn {
   String label;
   float w;
+  int align;
   
-  TableColumn(String label, float w) {
+  TableColumn(String label, float w, int align) {
     this.label = label;
     this.w = w;
+    this.align = align;
+  }
+  
+  TableColumn(String label, float w) {
+    this(label, w, LEFT);
   }
 }
 
@@ -78,7 +84,7 @@ class TableView extends View {
       
       /* draw scrollbar */
       fill(bgColor);
-      rect(0, 0, barSize, h);
+      rect(0, 1, barSize, h-1);
       
       float thumbH = map(int(h/rowHeight), 0, data.count(), 0, h);
       float thumbY = map(scrollPos, 0, maxScroll(), 0, h-thumbH);
@@ -102,7 +108,8 @@ class TableView extends View {
     float colx = 0;
     for (int j = 0; j < columns.size(); j++) {
       TableColumn col = columns.get(j);
-      text(data.getText(i, j), colx + MARGIN, 0, col.w, rowHeight);
+      textAlign(col.align, CENTER);
+      text(data.getText(i, j), colx + MARGIN, 0, col.w - MARGIN*2, rowHeight);
       colx += col.w;
     }
   }

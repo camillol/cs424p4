@@ -12,6 +12,59 @@ class HorizontalLayout {
   }
 }
 
+class CountryChooser extends Button implements ListDataSource {
+  boolean showing = false;
+  int chosen = 0;
+  ListBox countryListbox;
+  
+  CountryChooser(float x_, float y_, float w_, float h_)
+  {
+    super(x_,y_,w_,h_,"");
+    title = getText(chosen);
+    align = LEFT;
+    countryListbox = new ListBox(x_, y_+h_, w_, 200, this);
+    countryListbox.setAction(new ListAction() {
+      public void itemClicked(ListBox lb, int index, Object item) {
+        chosen = index;
+        title = getText(chosen);
+        if (action != null) action.respond(CountryChooser.this);
+      }
+    });
+  }
+  
+  boolean contentClicked(float lx, float ly)
+  {
+    showing = !showing;
+    if (showing) {
+      countryListbox.x = mouseX - lx;
+      countryListbox.y = mouseY - ly + h;
+      rootView.subviews.add(countryListbox);
+    } else rootView.subviews.remove(countryListbox);
+    return true;
+  }
+  
+  String getText(int index) {
+    if (index == 0) return "Any country";
+    else return data.countries.get(index - 1).name;
+  }
+  Object get(int index) {
+    if (index == 0) return null;
+    else return data.countries.get(index - 1);
+  }
+  int count() {
+    try {
+      return data.getCountries().size() + 1;
+    }
+    catch (NullPointerException e) {
+      return 1;
+    }
+  }
+  boolean selected(int index)
+  {
+    return index == chosen;
+  }
+}
+
 class TopArtistView extends View implements TableDataSource {
   UserFilter userFilter;
   GlyphCheckbox maleCB;
@@ -22,6 +75,7 @@ class TopArtistView extends View implements TableDataSource {
   TableView artistTable;
   Future<List<ArtistChartEntry>> artists;
   String artistsStatus;
+  CountryChooser countryChooser;
   
   final static int GENDER_LABEL_WIDTH = 40;
   final static int AGE_LABEL_WIDTH = 50;
@@ -58,6 +112,15 @@ class TopArtistView extends View implements TableDataSource {
       }
     });
     
+    layout.add(new Label(0, 0, 90, 20, "Country:", RIGHT));
+    layout.add(countryChooser = new CountryChooser(0, 0, 120, 20));
+    countryChooser.setAction(new Action<Button>() {
+      public void respond(Button b) {
+        userFilter.country = (Country)countryChooser.get(countryChooser.chosen);
+        filterChanged();
+      }
+    });
+    
 //    ageFromField.value = "0";
 //    ageToField.value = "122";  // longest documented human life
 
@@ -65,7 +128,7 @@ class TopArtistView extends View implements TableDataSource {
     
     artistTable = new TableView(0, 20, w, h-2, Arrays.asList(
       new TableColumn("Artist", w*0.8),
-      new TableColumn("Plays", w*0.2)
+      new TableColumn("Plays", w*0.2, RIGHT)
     ), this); // new MissingListDataSource("no artists")
     subviews.add(artistTable);
   }
