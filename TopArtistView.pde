@@ -12,14 +12,14 @@ class HorizontalLayout {
   }
 }
 
-class TopArtistView extends View implements ListDataSource {
+class TopArtistView extends View implements TableDataSource {
   UserFilter userFilter;
   GlyphCheckbox maleCB;
   GlyphCheckbox femaleCB;
   GlyphCheckbox noGenderCB;
   TextField ageFromField;
   TextField ageToField;
-  ListBox artistListbox;
+  TableView artistTable;
   Future<List<ArtistChartEntry>> artists;
   
   final static int GENDER_LABEL_WIDTH = 40;
@@ -44,13 +44,34 @@ class TopArtistView extends View implements ListDataSource {
     layout.add(new Label(0, 0, 20, 20, "-", CENTER));
     layout.add(ageToField = new TextField(0, 0, 30, 20));
     
-    ageFromField.value = "a";
-    ageToField.value = "b";
+    ageFromField.setAction(new Action<TextField>() {
+      public void respond(TextField tf) {
+        userFilter.ageMin = stringToAge(ageFromField.value);
+        filterChanged();
+      }
+    });
+    ageToField.setAction(new Action<TextField>() {
+      public void respond(TextField tf) {
+        userFilter.ageMax = stringToAge(ageToField.value);
+        filterChanged();
+      }
+    });
+    
+//    ageFromField.value = "0";
+//    ageToField.value = "122";  // longest documented human life
 
     reloadArtists();
     
-    artistListbox = new ListBox(0, 20, w, h-2, this); // new MissingListDataSource("no artists")
-    subviews.add(artistListbox);
+    artistTable = new TableView(0, 20, w, h-2, Arrays.asList(
+      new TableColumn("Artist", w*0.8),
+      new TableColumn("Plays", w*0.2)
+    ), this); // new MissingListDataSource("no artists")
+    subviews.add(artistTable);
+  }
+  
+  int stringToAge(String s)
+  {
+    return DONTCARE;
   }
   
   GlyphCheckbox makeGenderCheckbox(final int flag, String letter, int x, int y)
@@ -62,10 +83,15 @@ class TopArtistView extends View implements ListDataSource {
         Checkbox cb = (Checkbox)b;
         if (cb.checked) userFilter.gender |= flag;
         else userFilter.gender &= ~flag;
-        reloadArtists();
+        filterChanged();
       }
     });
     return cb;
+  }
+  
+  void filterChanged()
+  {
+    reloadArtists();
   }
   
   void reloadArtists()
@@ -94,7 +120,15 @@ class TopArtistView extends View implements ListDataSource {
     return a;
   }
 
-  String getText(int index) { return artists.isDone() ? getArtists().get(index).artist.name : "Loading..."; }
+  String getText(int index, int column) {
+    if (artists.isDone()) {
+      if (column == 0) return getArtists().get(index).artist.name;
+      else return str(getArtists().get(index).playCount);
+    } else {
+      if (column == 0) return "Loading...";
+      else return "";
+    }
+  }
   Object get(int index) { return artists.isDone() ? getArtists().get(index) : null; }
   int count() { return artists.isDone() ? getArtists().size() : 1; }
   boolean selected(int index) { return false; }

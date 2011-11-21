@@ -57,11 +57,26 @@ class UserFilter {
   
   String queryString()
   {
+    List<String> params = new ArrayList<String>();
     String genderQ = "";
     if ((gender & MALE) != 0) genderQ += "m";
     if ((gender & FEMALE) != 0) genderQ += "f";
     if ((gender & UNKNOWN) != 0) genderQ += "u";
-    if (genderQ.length() < 3 && genderQ.length() > 0) return "?gender=" + genderQ;
+    if (genderQ.length() < 3 && genderQ.length() > 0) params.add("gender=" + genderQ);
+    
+    if (ageMin != DONTCARE) params.add("ageMin=" + ageMin);
+    if (ageMax != DONTCARE) params.add("ageMax=" + ageMax);    
+    
+    if (params.size() > 0) {
+      String paramString = "?";
+      boolean first = true;
+      for (String p : params) {
+        if (first) first = false;
+        else paramString += "&";
+        paramString += p;
+      }
+      return paramString;
+    }
     else return "";
   }
 }

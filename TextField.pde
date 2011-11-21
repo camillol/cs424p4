@@ -3,10 +3,16 @@ class TextField extends View {
   int pos;
   color fgColor = 255;
   final static int MARGIN = 3;
+  Action<TextField> action = null;
   
   TextField(float x_, float y_, float w_, float h_)
   {
     super(x_,y_,w_,h_);
+  }
+  
+  void setAction(Action<TextField> action)
+  {
+    this.action = action;
   }
   
   void drawContent(float lx, float ly)
@@ -35,7 +41,10 @@ class TextField extends View {
   void keyTyped()
   {
     if (key == CODED) println(keyCode);
-    else if (key == BACKSPACE && value.length() > 0) value = value.substring(0, value.length()-1);
-    else value = value + key;
+    else {
+      if (key == BACKSPACE && value.length() > 0) value = value.substring(0, value.length()-1);
+      else value = value + key;
+      if (action != null) action.respond(this);
+    }
   }
 }
