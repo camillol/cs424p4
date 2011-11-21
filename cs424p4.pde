@@ -52,6 +52,9 @@ void setup()
     }
   });
   
+  MapView mapView = new MapView(100,100,400,300);
+  rootView.subviews.add(mapView);
+  
 //  mbidtoArtist("b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d");
 }
 

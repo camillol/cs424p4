@@ -86,10 +86,12 @@ class UserFilter {
 class Country {
   int id;
   String name;
+  String code;
   
-  Country(int id, String name) {
+  Country(int id, String name, String code) {
     this.name = name;
     this.id = id;
+    this.code = code;
   }
 }
 
@@ -160,7 +162,7 @@ class WebDataSource {
         countries = new ArrayList<Country>(239);
         for (int i = 0; i < result.length(); i++) {
           JSONObject aj = result.getJSONObject(i);
-          countries.add(new Country(aj.getInt("id"), aj.getString("name")));
+          countries.add(new Country(aj.getInt("id"), aj.getString("name"), aj.getString("code")));
         }
       }
       catch (JSONException e) {
