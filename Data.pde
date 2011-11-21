@@ -124,6 +124,7 @@ class WebDataSource {
   ExecutorService loadExec;
   
   List<Country> countries;
+  Map<String, Country> countryCodeMap;
   
   WebDataSource(String baseURL)
   {
@@ -171,6 +172,10 @@ class WebDataSource {
       catch (NullPointerException e) {
         
       }
+      if (countries != null) {
+        countryCodeMap = new HashMap<String, Country>(countries.size());
+        for (Country c : countries) countryCodeMap.put(c.code, c);
+      }
     }
     return countries;
   }
@@ -181,6 +186,12 @@ class WebDataSource {
       if (c.name.equalsIgnoreCase(name)) return c;
     }
     return null;
+  }
+  
+  Country getCountryByCode(String code)
+  {
+    getCountries();
+    return countryCodeMap.get(code);
   }
   
   Future<List<ArtistChartEntry>> getTopArtists(final UserFilter userFilter)

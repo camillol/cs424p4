@@ -59,3 +59,6 @@ create index top_artists2_age_country_id_idx on top_artists2(age,country_id);
 
 
 alter table countries add column code char(2);
+create unique index countries_code_idx on countries(code);
+
+
