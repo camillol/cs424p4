@@ -63,12 +63,42 @@ class ArtistDetailView extends View {
     artist_image = loadImage(image_url, "jpg");
     createChartPopularityByAge();
     
-    TableView artist_info = new TableView(COLUMN_1, ROW_3, 400, 200, Arrays.asList(
+    TableView artist_info = new TableView(COLUMN_1, ROW_3, 300, 200, Arrays.asList(
       new TableColumn("Fact", 100), new TableColumn("Value", 100)), new ArtistInfo(artist));
     this.subviews.add(artist_info);
-    
+    addAgeChart();
   }
-  
+ 
+  void addAgeChart(){
+    ArrayList<ArtistAgeBreakdown> age_breakdown = artist.getAgeBreakdown();
+    String [] labels = new String[age_breakdown.size()];
+    float [] values = new float[age_breakdown.size()];
+    int i=0;
+    for(ArtistAgeBreakdown artist_age_breakdown : age_breakdown){
+      labels[i] = artist_age_breakdown.ageRange;
+      values[i] = artist_age_breakdown.count;
+      i++;
+    }
+    final String barLabels[] = labels;
+    final float barValues[] = values;
+    BarChart age_chart = new BarChart(COLUMN_2, ROW_3, 400, 200, new BarChartDataSource(){
+      public String getLabel(int index) { return barLabels[index]; }
+      public float getValue(int index) { return barValues[index]; }
+      public int count() { return barLabels.length; }
+      public float getMaxValue() { return barValues.length > 0 ? max(barValues) : 0;}
+      public color getColor(int index) { int x = (int)(((float)(index+1) / barLabels.length) * 255); System.out.println(x); return x; }
+    }, true, true);
+    age_chart.setTitle("Users count by age");
+    this.subviews.add(age_chart);
+  }
+
+  void addSimilarArtistsChart(){
+    ArrayList<Artist> similar = artist.similar();
+    TableView artist_info = new TableView(COLUMN_1, ROW_3, 300, 200, Arrays.asList(
+      new TableColumn("Fact", 100), new TableColumn("Value", 100)), new ArtistInfo(artist));
+    this.subviews.add(artist_info);
+  }
+
   void drawTitle(){
     textAlign(BOTTOM);
     fill(200);

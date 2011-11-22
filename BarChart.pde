@@ -11,9 +11,11 @@ class BarChart extends View {
   BarChartDataSource data;
   boolean showLabels;
   boolean showScale;
+  String title;
   
   final static int LABEL_HEIGHT = 20;
   final static int SCALE_WIDTH = 30;
+  final static int TITLE_HEIGHT = 10;
   
   BarChart(float x_, float y_, float w_, float h_, BarChartDataSource data, boolean showLabels, boolean showScale)
   {
@@ -23,8 +25,22 @@ class BarChart extends View {
     this.showScale = showScale;
   }
   
+  public void setTitle(String title){
+    this.title = title;
+  }
+  
+  public void drawTitle(){
+    if(title != null){
+       fill(255);
+       textAlign(BASELINE);
+       float x_offset = w / 2 - (title.length() * 10 / 2 );
+       text(title, x_offset ,0); 
+    }
+  }
+  
   void drawContent(float lx, float ly)
   {
+    drawTitle();
     stroke(255);
     
     int count = data.count();
@@ -46,7 +62,7 @@ class BarChart extends View {
     
     textAlign(CENTER, CENTER);
     for (int i = 0; i < count; i++) {
-      float barh = hmax * data.getValue(i) / vmax;
+      float barh = (hmax-TITLE_HEIGHT) * data.getValue(i) / vmax;
       fill(data.getColor(i));
       rect(barx, hmax-barh, barw, barh);
       if (showLabels) {

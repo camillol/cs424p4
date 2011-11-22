@@ -2,25 +2,70 @@ import org.json.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+
+
+public Artist findArtist(int id){
+  String request = host + "artists/" + id + ".json";
+  println(request);
+  try {
+    JSONObject result = new JSONObject(join(loadStrings(request), ""));
+    return new Artist(result.getInt("id"), result.getString("mbid"), result.getString("name"));
+  }
+  catch (JSONException e) {
+       println (e);
+  }
+  return null;
+}
+
 class Artist {
   int id;
   String mbid;
   String name;
+  String image_url;
   
   ArrayList<ArtistGenderBreakdown> gender_breakdown;
+  ArrayList<ArtistAgeBreakdown> age_breakdown;
+  ArrayList<ARtist> similar;
   public int user_count=0,song_count=0;
   
   public boolean user_count_set = false, song_count_set=false;
+  Artist(String mbid, String name, String image_url){
+    this.mbid = mbid;
+    this.name = name;
+    this.image_url = image_url;
+  }
+
   Artist(int id, String mbid, String name) {
     this.id = id;
     this.mbid = mbid;
     this.name = name;
   }
+
+  ArrayList<Artist> similar(){
+    if(similar == null){
+      similar = new ArrayList<Artist>();
+      String request = host + "artists/" + id + "/similar.json";
+      println(request);
+      try {
+        JSONArray result = new JSONArray(join(loadStrings(request), ""));
+        for (int i = 0; i < result.length(); i++){
+          JSONObject aj = result.getJSONObject(i);
+          System.out.println(aj);
+          similar.add(new Artist(aj.getString("mbid"), aj.getString("name"), aj.getString("thumbnail")));
+        }
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    return similar;
+  } 
+  
   
   ArrayList<String> getImageUrls(){
     return LastFmWrapper.getImageUrls(name);
   }
-  
+
   int getSongCount(){
     if(!song_count_set){
       String request = host + "artists/" + id + "/songs.json";
@@ -52,6 +97,26 @@ class Artist {
       }
     }
     return user_count;
+  }
+
+  ArrayList<ArtistAgeBreakdown> getAgeBreakdown(){
+    if(age_breakdown == null){
+      age_breakdown = new ArrayList<ArtistAgeBreakdown>();
+      String request = host + "artists/" + id + "/users/age_stats.json";
+      println(request);
+      try {
+        JSONArray result = new JSONArray(join(loadStrings(request), ""));
+        for (int i = 0; i < result.length(); i++){
+          JSONObject aj = result.getJSONObject(i);
+          System.out.println(aj);
+          age_breakdown.add(new ArtistAgeBreakdown(aj.getString("age_range"), aj.getInt("count")));
+        }
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    return age_breakdown;
   }
 
   ArrayList<ArtistGenderBreakdown> getGenderBreakdown(){
@@ -212,6 +277,15 @@ class ArtistGenderBreakdown{
   public int count;
   ArtistGenderBreakdown(int gender, int count){
     this.gender = gender;
+    this.count = count;
+  }
+}
+
+class ArtistAgeBreakdown{
+  public String ageRange;
+  public int count;
+  ArtistAgeBreakdown(String ageRange, int count){
+    this.ageRange = ageRange;
     this.count = count;
   }
 }

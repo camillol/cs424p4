@@ -38,37 +38,36 @@ public class LastFmWrapper {
 		String returnVar = "";
 		System.out.println("Related artist to " + artist);
 		PaginatedResult<Event> pastEvents = Artist.getPastEvents(artist, key);
-		for (Event event : pastEvents.getPageResults()) {
+		for (Event event : pastEvents.getPageResults()){
 			returnVar = returnVar + event.getVenue().getLatitude() + ","+ event.getVenue().getLongitude() + event.getStartDate().toString() + "\n";
-			
 		}
 		return returnVar;
-		
 	}
-        public static ArrayList<String> getImageUrls(String artist_name){
-          ArrayList<String> images = new ArrayList<String>();
+  public static ArrayList<String> getImageUrls(String artist_name){
+    ArrayList<String> images = new ArrayList<String>();
 		for(Image image : Artist.getImages(artist_name, key).getPageResults()){
 		  images.add(image.getImageURL(ImageSize.EXTRALARGE));
-}
-          return images;
-        }
+    }
+    return images;
+  }
+
 	/**
 	 * @param artist 
 	 * This parameter is a string which is the artist to get a relative
 	 * @return
 	 */
-	public static String getRelArtist(String artist){
-		String returnVar = "";
+   /*
+	public static ArrayList<Artist> getRelArtist(String artist){
 		System.out.println("Related artist to " + artist);
+    ArrayList<String> related_artists = new ArrayList<String>();
 		Collection<Artist> similarArtists = Artist.getSimilar(artist, key);
-		for (Artist artist2 : similarArtists) {
-			returnVar = returnVar + artist2.getName() + "\n";
-                        System.out.println(returnVar);
-			
+		for (Artist artist : similarArtists){
+      related_artists.add(new Artist(artist.getMBID(), artist.getName(), artist.getImageUrl());
 		}
-		return returnVar;
-		
+		return related_artists;
 	}
+  */
+
 	public static void main(String[] args) {
 		if(args[0].equals("test")){
 			System.out.println(getTopTracks() + getRelArtist("Coldplay"));
