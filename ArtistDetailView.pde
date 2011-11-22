@@ -55,7 +55,7 @@ class ArtistDetailView extends View {
   ArtistDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
     
-    genderPieChart = new PieChart(COLUMN_2, ROW_2, 200, 200, new MissingPieChartDataSource(), true, "Listeners by gender");
+    genderPieChart = new PieChart(COLUMN_2, ROW_2, 200, 200, new MissingPieChartDataSource("no data"), true, "Listeners by gender");
     this.subviews.add(genderPieChart);
     
     artist_info = new TableView(COLUMN_1, ROW_3, 400, 200, Arrays.asList(
@@ -70,7 +70,7 @@ class ArtistDetailView extends View {
     artist = a;
     if (artist == null) {
       artist_image = data.getMissingImage();
-      genderPieChart.data = new MissingPieChartDataSource();
+      genderPieChart.data = new MissingPieChartDataSource("no data");
       artist_info.data = new MissingTableDataSource("no data");
     } else {
       ArrayList<String> image_urls = artist.getImageUrls();
