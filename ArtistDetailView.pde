@@ -127,12 +127,48 @@ class ArtistDetailView extends View {
 
 class SongDetailView extends View {
   TextField searchField;
+  Button searchButton;
+  TableView searchResults;
+  
+  Song song;
   
   SongDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
     
+    song = null;
+    
     searchField = new TextField(20, 20, 300, 20);
     subviews.add(searchField);
+    
+    searchButton = new Button(320, 20, 100, 20, "Search");
+    searchButton.setAction(new Action<Button>() {
+      public void respond(Button b) {
+        searchResults.data = new AsyncTableDataSource(data.searchSongs(searchField.value));
+      }
+    });
+    subviews.add(searchButton);
+    
+    searchResults = new TableView(20, 40, 400, 100, Arrays.asList(
+      new TableColumn("Name", 100), new TableColumn("Artist", 100)), new MissingTableDataSource("no data"));
+    this.subviews.add(searchResults);
+  }
+  
+  String getTitle()
+  {
+    if (song == null) return "<no song>";
+    else return song.title;
+  }
+
+  void drawTitle(){
+    textAlign(TOP);
+    fill(200);
+    textSize(40);
+    text(getTitle(), 20, 180);
+    textSize(normalFontSize);
+  }
+  
+  void drawContent(float lx, float ly){
+    drawTitle();
   }
 }
 

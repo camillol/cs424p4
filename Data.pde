@@ -230,16 +230,33 @@ class Country {
 
 class Song {
   int id;
-  String ref;
+  String mbid;
   String title;
   Artist artist;
   
-  Song(int id, String ref, String title, Artist artist) {
+  Song(int id, String mbid, String title, Artist artist) {
     this.title = title;
     this.id = id;
-    this.ref = ref;
+    this.mbid = mbid;
     this.artist = artist;
   }
+}
+
+class SongList implements TableDataSource {
+  List<Song> songs;
+  
+  SongList(List<Song> songs) {
+    this.songs = songs;
+  }
+  
+  String getText(int index, int column) {
+    if (column == 0) return songs.get(index).title;
+    else return songs.get(index).artist.name;
+  }
+  Object get(int index) { return songs.get(index); }
+  int count() { return songs.size(); }
+  boolean selected(int index) { return false; }
+  PImage getImage(int index, int column){ return null; }
 }
 
 class ArtistList implements TableDataSource {
@@ -729,6 +746,37 @@ class WebDataSource {
        println (e);
     }
     return null;
+  }
+  
+  Future<SongList> searchSongs(final String q){
+    return loadExec.submit(new Callable<SongList>() {
+      public SongList call() {
+        List<Song> songs = new ArrayList<Song>();
+        String resultStr = null;
+        try {
+          String request = baseURL + "songs/by_title/" + java.net.URLEncoder.encode(q, "UTF-8") + ".json";
+          println(request);
+          resultStr = join(loadStrings(request), "");
+          JSONArray result = new JSONArray(resultStr);
+          for (int i = 0; i < result.length(); i++){
+            JSONObject aj = result.getJSONObject(i);
+            JSONObject artj = aj.getJSONObject("artist");
+            songs.add(new Song(aj.getInt("id"), aj.getString("mbid"), aj.getString("title"),
+              new Artist(artj.getInt("id"), artj.getString("mbid"), artj.getString("name"))));
+          }
+        }
+        catch (UnsupportedEncodingException e) {
+          println("searchSongs");
+          println (e);
+        }
+        catch (JSONException e) {
+          println("searchSongs");
+          println (e);
+          println(resultStr);
+        }
+        return new SongList(songs);
+      }
+    });
   }
 }
 
