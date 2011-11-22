@@ -6,6 +6,17 @@ interface BarChartDataSource {
   color getColor(int index);
 }
 
+class MissingBarChartDataSource implements BarChartDataSource {
+  String msg;
+  
+  MissingBarChartDataSource(String msg_) { msg = msg_; }
+  String getLabel(int index) { return msg; }
+  float getValue(int index) { return 0; }
+  int count() { return 1; }
+  float getMaxValue() { return 0; }
+  color getColor(int index) { return 0;  }
+}
+
 class BarChart extends View {
   
   BarChartDataSource data;
