@@ -28,7 +28,7 @@ class MapView extends View {
     }
     println();*/
 
-    for (Country c : data.getCountries()) {
+    if (data.getCountries() != null) for (Country c : data.getCountries()) {
       PShape cShape = mapShape.getChild(c.code);
       if (cShape == null) println("no shape for " + c.code);
     }

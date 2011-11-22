@@ -194,11 +194,11 @@ class UserFilterView extends View {
   }
 }
 
-class TopArtistView extends View implements TableDataSource {
+class TopArtistView extends View {
   UserFilter userFilter;
   UserFilterView ufView;
   TableView artistTable;
-  Future<List<ArtistChartEntry>> artists;
+  Future<ArtistChart> artists;
   String artistsStatus;
   
   TopArtistView(float x_, float y_, float w_, float h_, UserFilter initialFilter)
@@ -209,7 +209,7 @@ class TopArtistView extends View implements TableDataSource {
     artistTable = new TopArtistsTable(0, 40, w, h-40, Arrays.asList(
       new TableColumn("Artist", w*0.8),
       new TableColumn("Plays", w*0.2, RIGHT)
-    ), this); // new MissingListDataSource("no artists")
+    ), new MissingTableDataSource("no artists"));
     artistTable.action = new TableAction() {
       public void itemClicked(TableView tv, int index, Object item) {
         ArtistChartEntry entry = (ArtistChartEntry)item;
@@ -232,7 +232,6 @@ class TopArtistView extends View implements TableDataSource {
 
     reloadArtists();
   }
-  PImage getImage(int index, int column){return null;}
   
   void filterChanged()
   {
@@ -244,7 +243,7 @@ class TopArtistView extends View implements TableDataSource {
   {
     if (artists != null && !artists.isDone()) artists.cancel(true);
     artists = data.getTopArtists(userFilter);
-    artistsStatus = "Loading...";
+    artistTable.data = new AsyncTableDataSource(artists);
   }
   
   void drawContent(float lx, float ly)
@@ -254,33 +253,5 @@ class TopArtistView extends View implements TableDataSource {
     noFill();
     rect(0, 0, w, h);
   }
-  
-  List<ArtistChartEntry> getArtists()
-  {
-    List<ArtistChartEntry> a = null;
-    if (!artists.isDone()) return null;
-    try {
-      a = artists.get();
-    } catch (InterruptedException e) {
-      println(e);
-    } catch (ExecutionException e) {
-      artistsStatus = "Server request failed.";
-    }
-    return a;
-  }
-
-  String getText(int index, int column) {
-    List<ArtistChartEntry> as = getArtists();
-    if (as != null) {
-      if (column == 0) return as.get(index).artist.name;
-      else return str(getArtists().get(index).playCount);
-    } else {
-      if (column == 0) return artistsStatus;
-      else return "";
-    }
-  }
-  Object get(int index) { return getArtists() != null ? getArtists().get(index) : null; }
-  int count() { return getArtists() != null ? getArtists().size() : 1; }
-  boolean selected(int index) { return false; }
 }
 

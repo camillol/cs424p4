@@ -290,6 +290,23 @@ class ArtistChartEntry {
   }
 }
 
+class ArtistChart implements TableDataSource {
+  List<ArtistChartEntry> entries;
+  
+  ArtistChart(List<ArtistChartEntry> entries) {
+    this.entries = entries;
+  }
+  
+  String getText(int index, int column) {
+    if (column == 0) return entries.get(index).artist.name;
+    else return str(entries.get(index).playCount);
+  }
+  Object get(int index) { return entries.get(index); }
+  int count() { return entries.size(); }
+  boolean selected(int index) { return false; }
+  PImage getImage(int index, int column){return null;}
+}
+
 class ArtistGenderBreakdown implements PieChartDataSource {
   int mCount, fCount, uCount;
   ArtistGenderBreakdown(int mCount, int fCount, int uCount){
@@ -411,7 +428,7 @@ class WebDataSource {
   
   Country getCountryNamed(String name)
   {
-    for (Country c : getCountries()) {
+    if (getCountries() != null) for (Country c : getCountries()) {
       if (c.name.equalsIgnoreCase(name)) return c;
     }
     return null;
@@ -419,14 +436,14 @@ class WebDataSource {
   
   Country getCountryByCode(String code)
   {
-    getCountries();
-    return countryCodeMap.get(code);
+    if (getCountries() != null) return countryCodeMap.get(code);
+    else return null;
   }
   
-  Future<List<ArtistChartEntry>> getTopArtists(final UserFilter userFilter)
+  Future<ArtistChart> getTopArtists(final UserFilter userFilter)
   {
-    return loadExec.submit(new Callable<List<ArtistChartEntry>>() {
-      public List<ArtistChartEntry> call() {
+    return loadExec.submit(new Callable<ArtistChart>() {
+      public ArtistChart call() {
         List<ArtistChartEntry> entries = new ArrayList<ArtistChartEntry>(10);
         String request = baseURL + "top_artists" + userFilter.queryString();
         println(request);
@@ -442,7 +459,7 @@ class WebDataSource {
         catch (JSONException e) {
           println (e);
         }
-        return entries;
+        return new ArtistChart(entries);
       }
     });
   }
