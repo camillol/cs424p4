@@ -17,6 +17,31 @@ class MissingBarChartDataSource implements BarChartDataSource {
   color getColor(int index) { return 0;  }
 }
 
+class AsyncBarChartDataSource implements BarChartDataSource {
+  Future<? extends BarChartDataSource> data;
+  MissingBarChartDataSource noData;
+  AsyncBarChartDataSource(Future<? extends BarChartDataSource> data) {
+    this.data = data;
+    noData = new MissingBarChartDataSource("loading...");
+  }
+  BarChartDataSource getData() {
+    if (data.isDone()) try {
+      return data.get();
+    } catch (InterruptedException e) {
+      println(e);
+    } catch (ExecutionException e) {
+      println(e);
+      noData.msg = "request failed";
+    }
+    return noData;
+  }
+  String getLabel(int index) { return getData().getLabel(index); }
+  float getValue(int index) { return getData().getValue(index); }
+  int count() { return getData().count(); }
+  float getMaxValue() { return getData().getMaxValue(); }
+  color getColor(int index) { return getData().getColor(index); }
+}
+
 class BarChart extends View {
   
   BarChartDataSource data;

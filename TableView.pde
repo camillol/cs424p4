@@ -4,10 +4,10 @@ interface TableAction {
 
 interface TableDataSource {
   String getText(int index, int column);
-  PImage getImage(int index, int column);
   Object get(int index);
   int count();
   boolean selected(int index);
+  PImage getImage(int index, int column);
 }
 
 class MissingTableDataSource implements TableDataSource {
@@ -21,6 +21,31 @@ class MissingTableDataSource implements TableDataSource {
   PImage getImage(int index, int column){return null;}
 }
 
+class AsyncTableDataSource implements TableDataSource {
+   PImage getImage(int index, int column){ return null;}
+  Future<? extends TableDataSource> data;
+  MissingTableDataSource noData;
+  AsyncTableDataSource(Future<? extends TableDataSource> data) {
+    this.data = data;
+    noData = new MissingTableDataSource("loading...");
+  }
+  TableDataSource getData() {
+    if (data.isDone()) try {
+      return data.get();
+    } catch (InterruptedException e) {
+      println(e);
+    } catch (ExecutionException e) {
+      println(e);
+      noData.msg = "request failed";
+    }
+    return noData;
+  }
+  String getText(int index, int column) { return getData().getText(index,column); }
+  Object get(int index) { return getData().get(index); }
+  int count() { return getData().count(); }
+  boolean selected(int index) { return getData().selected(index); }
+}
+
 class TableColumn {
   String label;
   float w;
@@ -31,11 +56,6 @@ class TableColumn {
     this.label = label;
     this.w = w;
     this.align = align;
-  }
-
-  TableColumn(String label, float w, int align, boolean imagable){
-    this(label, w, align);
-    this.imagable = imagable;
   }
   
   TableColumn(String label, float w) {

@@ -39,50 +39,6 @@ class ArtistDetailView extends View {
     }
   }
 
-  class ArtistInfo implements TableDataSource{
-      Artist artist;
-      ArtistInfo(Artist artist){
-        this.artist = artist;
-      }
-      
-      PImage getImage(int index, int column){
-        return null; 
-      }
-      String getText(int index, int column){
-        fill(255);
-        if(index == 0){
-          if(column==0){
-            return "User count";
-          }
-          else{
-            return "" + artist.getUserCount();
-          }
-        }
-         if(index == 1){
-          if(column==0){
-            return "Song count";
-          }
-          else{
-            int song_count = artist.getSongCount();
-            if(song_count == 0)
-              return "Not Available";
-            else
-              return "" + song_count;
-          }
-        }
-        return "TEST";
-      }
-      Object get(int index){
-        return new Object();
-      }
-      int count(){
-        return 10;
-      }
-      boolean selected(int index){
-        return false;
-      }
-  }
-  
   int ROW_1 = 50;
   int ROW_2 = 100;
   int ROW_3 = 400;
@@ -113,7 +69,7 @@ class ArtistDetailView extends View {
     mapView = new MapView(300,400,400,220) {
       public void drawCountry(PShape cShape, String cc) {
         Country c = data.getCountryByCode(cc);
-        if (c != null && artist != null) {
+        if (c != null && artist != null && artist.getCountryBreakdown() != null) {
           Integer countInt = artist.getCountryBreakdown().get(c);
           int count = countInt == null ? 0 : countInt;
           fill(lerpColor(#ffffff, #ff0000, 1.0*count/artist.user_count));
@@ -136,9 +92,9 @@ class ArtistDetailView extends View {
       artist_info.data = new MissingTableDataSource("no data");
       age_chart.data = new MissingBarChartDataSource("no data");
     } else {
-      genderPieChart.data = artist.getGenderBreakdown();
-      artist_info.data = new ArtistInfo(artist);
-      age_chart.data = artist.getAgeBreakdown();
+      genderPieChart.data = new AsyncPieChartDataSource(artist.getGenderBreakdown());
+      artist_info.data = new AsyncTableDataSource(data.getArtistInfo(artist));
+      age_chart.data = new AsyncBarChartDataSource(artist.getAgeBreakdown());
       addSimilarArtistsTable();
     }
   }
@@ -157,7 +113,6 @@ class ArtistDetailView extends View {
       new TableColumn("Name", 100), new TableColumn("Image", 100, true)), new SimilarArtistEntry(similar));
     similar_artist_table.setRowHeight(200);
     this.subviews.add(similar_artist_table);
-    
   }
 
   void drawTitle(){
