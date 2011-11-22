@@ -265,6 +265,7 @@ class WeeklyTopArtistView extends View {
     super(x_,y_,w_,h_);
     wtaYear = yr;
     wtaWeek = week;
+    
     weekTopArtistTable = new TopArtistsTable(0, 40, w, h-40, Arrays.asList(
       new TableColumn("Artist", w*0.8),
       new TableColumn("Plays", w*0.2, RIGHT)

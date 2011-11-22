@@ -59,7 +59,18 @@ void setup()
   //rootView.subviews.add(topArtistsB);  
   topArtistsPane.subviews.add(topArtistsB);
   
-  topArtistsPane.subviews.add(new WeeklyTopArtistView(280, 340, 400, 240, 2008, 1));
+  topArtistsPane.subviews.add(new WeeklyTopArtistView(20, 340, 300, 240, 2008, 1));
+  
+  topArtistsPane.subviews.add(new RankingView(340, 390, 660, 200, new ArtistWeeklyRankSet(2008)));
+  
+  /*new RankingDataSource() {
+    public List get(int time) {
+      if (time == 0) return Arrays.asList("a", "b", "c", "d");
+      if (time == 1) return Arrays.asList("a", "c", "d", "e");
+      return Arrays.asList("c", "e", "a", "d");
+    }
+    public int times() {return 3;}
+  }));*/
   
 
   View artistDetailPane = mainTabView.tabs.get(1).pane;

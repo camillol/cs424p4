@@ -27,6 +27,17 @@ class Artist {
     this.mbid = mbid;
     this.name = name;
   }
+  
+  boolean equals(Artist other) {
+    if (id != -1 && id == other.id) return true;
+    if (mbid != null && mbid.length() > 0 && mbid.equals(other.mbid)) return true;
+    else return false;
+  }
+  
+  int hashCode() {
+    if (mbid != null && mbid.length() > 0) return mbid.hashCode();
+    else return new Integer(id).hashCode();
+  }
 
   PImage getImage(){
     if(image == null) image = data.getArtistImage(this);
@@ -304,6 +315,67 @@ class ArtistChart implements TableDataSource {
   PImage getImage(int index, int column){return null;}
 }
 
+class ArtistMultiChart implements RankingDataSource {
+  List<ArtistChart> charts;
+  ArtistMultiChart(List<ArtistChart> charts) {
+    this.charts = charts;
+  }
+  List get(int time) {
+    List l = new ArrayList<Artist>();
+    for (ArtistChartEntry e : charts.get(time).entries) l.add(e.artist);
+    return l;
+  }
+  int times() { return charts.size(); }
+}
+
+class ArtistWeeklyRankSet implements RankingDataSource {
+  List<Future<List<String>>> rankings;
+  int year;
+  ExecutorService loadExec;
+  ArrayList<String> empty;
+  
+  ArtistWeeklyRankSet(int yr) {
+    this.year = yr;
+    loadExec = Executors.newSingleThreadExecutor();
+    rankings = new ArrayList<Future<List<String>>>(52);
+    empty = new ArrayList<String>();
+    for (int i = 0; i < 52; i++) {
+      final int week = i+1;
+      rankings.add(loadExec.submit(new Callable<List<String>>() {
+        public List<String> call() {
+          ArrayList<String> artists = new ArrayList<String>(10);
+          String request = data.baseURL + "artists/top_by_week/" + year + "/" + week + ".json";
+          println(request);
+        
+          try {
+            JSONArray result = new JSONArray(data.loadRequest(request));
+            for (int i = 0; i < result.length(); i++) {
+              JSONObject aj = result.getJSONObject(i);
+              //Artist artist = new Artist(aj.getInt("id"), aj.getString("mbid"), aj.getString("name"));
+              artists.add(aj.getString("mbid"));
+            }
+          }
+          catch (JSONException e) {
+            println (e);
+          }
+          return artists;
+        }
+      }));
+    }
+  }
+  List get(int time) {
+    if (rankings.get(time).isDone()) try {
+      return rankings.get(time).get();
+    } catch (InterruptedException e) {
+      println(e);
+    } catch (ExecutionException e) {
+      println(e);
+    }
+    return empty;
+  }
+  int times() { return rankings.size(); }
+}
+
 class ArtistGenderBreakdown implements PieChartDataSource {
   int mCount, fCount, uCount;
   ArtistGenderBreakdown(int mCount, int fCount, int uCount){
@@ -540,6 +612,39 @@ class WebDataSource {
           println (e);
         }
         return new ArtistChart(entries);
+      }
+    });
+  }
+  
+  /* THIS HAS PROBLEMS */
+  Future<ArtistMultiChart> getTopArtistsForEveryWeekIn(final int yr)
+  {
+    return loadExec.submit(new Callable<ArtistMultiChart>() {
+      public ArtistMultiChart call() {
+        List<ArtistChart> charts = new ArrayList<ArtistChart>(52);
+        String request = baseURL + "artists/top_by_week/" + yr + ".json";
+        println(request);
+        int lastWeek = -1;
+        List<ArtistChartEntry> entries = null;
+        
+        try {
+          JSONArray result = new JSONArray(loadRequest(request));
+          for (int i = 0; i < result.length(); i++) {
+            JSONObject aj = result.getJSONObject(i);
+            int week = aj.getInt("week");
+            if (week != lastWeek) {
+              entries = new ArrayList<ArtistChartEntry>(10);
+              charts.add(new ArtistChart(entries));
+              lastWeek = week;
+            }
+            Artist artist = new Artist(aj.getInt("id"), aj.getString("mbid"), aj.getString("name"));
+            entries.add(new ArtistChartEntry(artist, aj.getInt("plays")));
+          }
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return new ArtistMultiChart(charts);
       }
     });
   }
