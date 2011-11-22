@@ -39,7 +39,7 @@ class Artist {
 //      loadStatus = "Server request failed.";
     }
     return data.getLoadingImage();
-  } 
+  }
   
   
   ArrayList<String> getImageUrls(){
@@ -217,12 +217,14 @@ class Country {
   String name;
   String code;
   int plays;
+  int users;
   
-  Country(int id, String name, String code, int plays) {
+  Country(int id, String name, String code, int plays, int users) {
     this.name = name;
     this.id = id;
     this.code = code;
     this.plays = plays;
+    this.users = users;
   }
 }
 
@@ -384,6 +386,21 @@ class LocalTimePlays implements BarChartDataSource {
   color getColor(int index) { return #aaaaaa; }
 }
 
+class GMTTimePlays {
+  Map<Country, int[]> byCountry;
+  
+  GMTTimePlays() {
+    byCountry = new HashMap<Country,int[]>();
+  }
+  
+  void put(Country c, int hr, int count) {
+    if (!byCountry.containsKey(c)) byCountry.put(c, new int[25]);  // 24 is used for max
+//    byHour[hr] -= byCountry.get(c)[hr];
+    byCountry.get(c)[hr] = count;
+    byCountry.get(c)[24] = max(byCountry.get(c)[24], count);
+  }
+}
+
 class WebDataSource {
   String baseURL;
   ExecutorService loadExec;
@@ -431,7 +448,7 @@ class WebDataSource {
         countries = new ArrayList<Country>(239);
         for (int i = 0; i < result.length(); i++) {
           JSONObject aj = result.getJSONObject(i);
-          countries.add(new Country(aj.getInt("id"), aj.getString("name"), aj.getString("code"), aj.getInt("plays")));
+          countries.add(new Country(aj.getInt("id"), aj.getString("name"), aj.getString("code"), aj.getInt("plays"), aj.getInt("user_count")));
         }
       }
       catch (JSONException e) {
@@ -672,6 +689,31 @@ class WebDataSource {
           println (e);
         }
         return ltp;
+      }
+    });
+  }
+  
+  Future<GMTTimePlays> getGMTTimePlays()
+  {
+    return loadExec.submit(new Callable<GMTTimePlays>() {
+      public GMTTimePlays call() {
+        GMTTimePlays gtp = null;
+        String request = baseURL + "plays_by_hour_gmt";
+        println(request);
+        try {
+          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          gtp = new GMTTimePlays();
+          for (int i = 0; i < result.length(); i++){
+            JSONObject aj = result.getJSONObject(i);
+            Country c = getCountryByCode(aj.getString("country_code"));
+            gtp.put(c, aj.getInt("gmt_hour"), aj.getInt("plays"));
+          }
+        }
+        catch (JSONException e) {
+          println("getLocalTimePlays");
+          println (e);
+        }
+        return gtp;
       }
     });
   }

@@ -77,4 +77,11 @@ where countries.name = users.country;
 
 
 
+alter table countries add column users integer;
+update countries set users = total
+from (select country_id, count(1) as total from users group by country_id) ct
+where ct.country_id = id;
+
+
+alter table countries rename column users to user_count;
 

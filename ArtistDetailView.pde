@@ -43,7 +43,7 @@ class ArtistDetailView extends View {
         Country c = data.getCountryByCode(cc);
         if (c != null && artist != null && artist.getCountryBreakdown() != null) {
           int count = artist.getCountryBreakdown().get(c);
-          fill(lerpColor(#000000, #ff0000, 1.0*count/artist.getCountryBreakdown().maxCount));
+          fill(lerpColor(#000000, #ff0000, 1.0*count/c.users));
         } else {
           fill(0);
         }

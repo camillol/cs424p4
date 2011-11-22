@@ -71,19 +71,6 @@ void setup()
   
 /*  View mapTestPane = mainTabView.tabs.get(2).pane;
 
-  MapView mapView = new MapView(100,100,400,300) {
-    public void drawCountry(PShape cShape, String cc) {
-      Country c = data.getCountryByCode(cc);
-      if (c != null) {
-        fill(lerpColor(#ffffff, #ff0000, 1.0*c.plays/853502673));
-      } else {
-        fill(#eeeeee);
-      }
-      super.drawCountry(cShape, cc);
-    }
-  };
-  mapTestPane.subviews.add(mapView); 
-  
   final String barLabels[] = {"one", "two", "three"};
   final float barValues[] = {120, 435, 65};
   final float barMax = 435;
@@ -100,6 +87,28 @@ void setup()
   timePane.subviews.add(new Label(40, 20, 300, 20, "Songs played by local time"));
   BarChart timeBarChart = new BarChart(40, 40, 700, 200, new AsyncBarChartDataSource(data.getLocalTimePlays()), true, true);
   timePane.subviews.add(timeBarChart);
+  
+  final Future<GMTTimePlays> gtpf = data.getGMTTimePlays();
+  MapView mapView = new MapView(40,300,700,400) {
+    public void drawCountry(PShape cShape, String cc) {
+      Country c = data.getCountryByCode(cc);
+      fill(#eeeeee);
+      if (c != null && gtpf.isDone()) {
+        int[] counts;
+        try {
+          counts = gtpf.get().byCountry.get(c);
+          if (counts != null) fill(lerpColor(#ffffff, #ff0000, 1.0*counts[second() % 24]/counts[24]));
+        } catch (InterruptedException e) {
+          println(e);
+        } catch (ExecutionException e) {
+          println(e);
+        }
+      }
+      super.drawCountry(cShape, cc);
+    }
+  };
+  timePane.subviews.add(mapView); 
+  
   
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
