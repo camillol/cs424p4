@@ -12,7 +12,7 @@ color borderColor = 128;
 WebDataSource data;
 
 Checkbox testCB;
-// String host = "http://localhost:3000/"; 
+//String host = "http://localhost:3000/"; 
 String host = "http://radiogaga.heroku.com/";
 
 PFont font;
@@ -60,7 +60,7 @@ void setup()
   View artistDetailPane = mainTabView.tabs.get(1).pane;
   /* Eugine, add artist detail views to artistDetailPane.subviews */
   Artist artist = new Artist(4112, "f59c5520-5f46-4d2c-b2c4-822eabf53419", "Eminem");
-  ArtistDetailView artistDetailView = new ArtistDetailView(0,0,width,height, artist);
+  ArtistDetailView artistDetailView = new ArtistDetailView(0,0,width,height);
   artistDetailPane.subviews.add(artistDetailView);
   
   View mapTestPane = mainTabView.tabs.get(2).pane;

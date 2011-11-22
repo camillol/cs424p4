@@ -7,8 +7,8 @@ class Artist {
   String mbid;
   String name;
   
-  ArrayList<ArtistGenderBreakdown> gender_breakdown;
   public int user_count=0,song_count=0;
+  ArtistGenderBreakdown genderBreakdown = null;
   
   public boolean user_count_set = false, song_count_set=false;
   Artist(int id, String mbid, String name) {
@@ -36,6 +36,33 @@ class Artist {
     }
     return song_count;
   }
+  
+  ArtistGenderBreakdown getGenderBreakdown(){
+    user_count = 0;
+    if(genderBreakdown == null){
+      int mCount = 0, fCount = 0, uCount = 0;
+      String request = host + "artists/" + id + "/users/gender_stats.json";
+      println(request);
+      try {
+        JSONArray result = new JSONArray(join(loadStrings(request), ""));
+        for (int i = 0; i < result.length(); i++){
+          JSONObject aj = result.getJSONObject(i);
+          String gender = aj.getString("gender");
+          int count = aj.getInt("count");
+          user_count += count;
+          if(gender.equals("null")) uCount = count;
+          else if(gender.equals("m")) mCount = count;
+          else if(gender.equals("f")) fCount = count;
+        }
+        genderBreakdown = new ArtistGenderBreakdown(mCount, fCount, uCount);
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    user_count_set = true;
+    return genderBreakdown;
+  }
 
   int getUserCount(){
     if(!user_count_set){
@@ -52,38 +79,6 @@ class Artist {
       }
     }
     return user_count;
-  }
-
-  ArrayList<ArtistGenderBreakdown> getGenderBreakdown(){
-    user_count = 0;
-    if(gender_breakdown == null){
-      gender_breakdown = new ArrayList<ArtistGenderBreakdown>();
-      String request = host + "artists/" + id + "/users/gender_stats.json";
-      println(request);
-      try {
-        JSONArray result = new JSONArray(join(loadStrings(request), ""));
-        for (int i = 0; i < result.length(); i++){
-          JSONObject aj = result.getJSONObject(i);
-          String gender = aj.getString("gender");
-          int count = aj.getInt("count");
-          user_count+=count;
-          if(gender.equals("null")){
-            gender_breakdown.add(new ArtistGenderBreakdown(UNKNOWN, count));
-          }
-          else if(gender.equals("m")){
-            gender_breakdown.add(new ArtistGenderBreakdown(MALE, count));
-          }
-          else if(gender.equals("f")){
-            gender_breakdown.add(new ArtistGenderBreakdown(FEMALE, count));
-          }
-        }
-      }
-      catch (JSONException e) {
-        println (e);
-      }
-    }
-    user_count_set = true;
-    return gender_breakdown;
   }
 }
 
@@ -207,12 +202,30 @@ class ArtistChartEntry {
   }
 }
 
-class ArtistGenderBreakdown{
-  public int gender;
-  public int count;
-  ArtistGenderBreakdown(int gender, int count){
-    this.gender = gender;
-    this.count = count;
+class ArtistGenderBreakdown implements PieChartDataSource {
+  int mCount, fCount, uCount;
+  ArtistGenderBreakdown(int mCount, int fCount, int uCount){
+    this.mCount = mCount;
+    this.fCount = fCount;
+    this.uCount = uCount;
+  }
+  
+  String getLabel(int index) {
+    if (index == 0) return "Male (" + mCount + ")";
+    else if (index == 1) return "Female (" + fCount + ")";
+    else return "Unknown (" + uCount + ")";
+  }
+  float getValue(int index) {
+    if (index == 0) return mCount;
+    else if (index == 1) return fCount;
+    else return uCount;
+  }
+  int count() { return 3; }
+  float getTotal() {
+    return mCount + fCount + uCount;
+  }
+  color getColor(int index) {
+    return int(index / 3.0 * 255.0);
   }
 }
 
@@ -222,6 +235,8 @@ class WebDataSource {
   
   List<Country> countries;
   Map<String, Country> countryCodeMap;
+  
+  PImage missingImage = null;
   
   WebDataSource(String baseURL)
   {
@@ -313,6 +328,14 @@ class WebDataSource {
         return entries;
       }
     });
+  }
+  
+  PImage getMissingImage()
+  {
+    if (missingImage == null) {
+      missingImage = loadImage(baseURL + "assets/photo_not_available.jpg", "jpg");
+    }
+    return missingImage;
   }
 }
 
