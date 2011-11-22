@@ -49,24 +49,42 @@ class ArtistDetailView extends View {
   
   Artist artist; 
   PImage artist_image;
-  String photo_not_available = host + "assets/photo_not_available.jpg";
-
+  PieChart genderPieChart;
+  TableView artist_info;
   
-  ArtistDetailView(float x_, float y_, float w_, float h_, Artist artist){
+  ArtistDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
-    this.artist = artist;
     
-    ArrayList<String> image_urls = artist.getImageUrls();
-    String image_url = photo_not_available;
-    if(image_urls.size() > 0)
-      image_url = image_urls.get(0);
-    artist_image = loadImage(image_url, "jpg");
-    createChartPopularityByAge();
+    genderPieChart = new PieChart(COLUMN_2, ROW_2, 200, 200, new MissingPieChartDataSource(), true, "Listeners by gender");
+    this.subviews.add(genderPieChart);
     
-    TableView artist_info = new TableView(COLUMN_1, ROW_3, 300, 200, Arrays.asList(
-      new TableColumn("Fact", 100), new TableColumn("Value", 100)), new ArtistInfo(artist));
+    artist_info = new TableView(COLUMN_1, ROW_3, 400, 200, Arrays.asList(
+      new TableColumn("Fact", 100), new TableColumn("Value", 100)), new MissingTableDataSource("no data"));
     this.subviews.add(artist_info);
-    addAgeChart();
+
+    setArtist(null);
+  }
+  
+  void setArtist(Artist a)
+  {
+    artist = a;
+    if (artist == null) {
+      artist_image = data.getMissingImage();
+      genderPieChart.data = new MissingPieChartDataSource();
+      artist_info.data = new MissingTableDataSource("no data");
+    } else {
+      ArrayList<String> image_urls = artist.getImageUrls();
+      if(image_urls.size() > 0) artist_image = loadImage(image_urls.get(0), "jpg");
+      else artist_image = data.getMissingImage();
+      genderPieChart.data = artist.getGenderBreakdown();
+      artist_info.data = new ArtistInfo(artist);
+    }
+  }
+  
+  String getTitle()
+  {
+    if (artist == null) return "<no artist>";
+    else return artist.name;
   }
  
   void addAgeChart(){
@@ -103,7 +121,7 @@ class ArtistDetailView extends View {
     textAlign(BOTTOM);
     fill(200);
     textSize(40);
-    text(artist.name, COLUMN_1,ROW_1);
+    text(getTitle(), COLUMN_1,ROW_1);
     textSize(normalFontSize);
   }
   
@@ -118,18 +136,6 @@ class ArtistDetailView extends View {
   
   void drawFacts(){
     
-  }
-  
-  void createChartPopularityByAge(){
-    ArrayList<ArtistGenderBreakdown> gender_breakdown = artist.getGenderBreakdown(); 
-    ArrayList<Integer> angles = new ArrayList<Integer>(gender_breakdown.size());
-    ArrayList<String> labels  = new ArrayList<String>(gender_breakdown.size());
-    for( ArtistGenderBreakdown br : gender_breakdown){
-      angles.add( new Integer(round(((float)br.count) / artist.user_count * 360)));
-      labels.add(getGenderName(br.gender) + " (" + br.count + ")");
-    }
-    PieChart genderPieChart = new PieChart(COLUMN_2,ROW_2,200,200, labels, angles, PieChart.CHART_TYPE_GENDER, "Listeners by gender");
-    this.subviews.add(genderPieChart);
   }
   
   void drawContent(float lx, float ly){

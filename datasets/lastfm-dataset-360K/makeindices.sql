@@ -66,3 +66,14 @@ update countries set plays = total
 from (select country_id, sum(plays) as total from top_artists2_no_age group by country_id) ct
 where ct.country_id = id;
 
+
+alter table users_artists rename to user_artists;
+
+
+alter table users add column country_id integer;
+update users set country_id = countries.id
+from countries
+where countries.name = users.country;
+
+
+

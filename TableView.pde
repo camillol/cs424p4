@@ -9,6 +9,16 @@ interface TableDataSource {
   boolean selected(int index);
 }
 
+class MissingTableDataSource implements TableDataSource {
+  String msg;
+  
+  MissingTableDataSource(String msg_) { msg = msg_; }
+  String getText(int index, int column) { return msg; }
+  Object get(int index) { return null; }
+  int count() { return 1; }
+  boolean selected(int index) { return false; }
+}
+
 class TableColumn {
   String label;
   float w;

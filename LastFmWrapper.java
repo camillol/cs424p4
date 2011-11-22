@@ -68,12 +68,5 @@ public class LastFmWrapper {
 	}
   */
 
-	public static void main(String[] args) {
-		if(args[0].equals("test")){
-			System.out.println(getTopTracks() + getRelArtist("Coldplay"));
-		}
-		
-		
-	}
 }
 
