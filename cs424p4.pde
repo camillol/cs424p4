@@ -59,7 +59,7 @@ void setup()
 
   View artistDetailPane = mainTabView.tabs.get(1).pane;
   /* Eugine, add artist detail views to artistDetailPane.subviews */
-  Artist artist = findArtist(4112);
+  Artist artist = findArtist(154704);
   ArtistDetailView artistDetailView = new ArtistDetailView(0,0,width,height);
   artistDetailView.setArtist(artist);
   artistDetailPane.subviews.add(artistDetailView);

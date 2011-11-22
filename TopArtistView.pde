@@ -168,6 +168,7 @@ class TopArtistView extends View implements TableDataSource {
 
     reloadArtists();
   }
+  PImage getImage(int index, int column){return null;}
   
   int stringToAge(String s)
   {

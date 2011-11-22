@@ -1,10 +1,52 @@
 import java.util.*;
 
 class ArtistDetailView extends View {
+  class SimilarArtistEntry implements TableDataSource{
+    ArrayList<Artist> artists;
+
+    SimilarArtistEntry(ArrayList<Artist> artists){
+      this.artists = artists;
+    }
+    String getText(int index, int column){
+      Artist artist = artists.get(index);
+      if(column == 0){
+        return artist.name;
+      }
+      else{
+        return artist.image_url;
+      }
+    }
+
+    PImage getImage(int index, int column){
+      Artist artist = artists.get(index);
+      if(column == 1){
+        return artist.image;
+      }
+      else{
+        return null;
+      }
+    }
+
+    Object get(int index){
+        return new Object();
+    }
+
+    int count(){
+      return artists.size();
+    }
+    boolean selected(int index){
+      return false;
+    }
+  }
+
   class ArtistInfo implements TableDataSource{
       Artist artist;
       ArtistInfo(Artist artist){
         this.artist = artist;
+      }
+      
+      PImage getImage(int index, int column){
+        return null; 
       }
       String getText(int index, int column){
         fill(255);
@@ -46,9 +88,9 @@ class ArtistDetailView extends View {
   int ROW_3 = 400;
   int COLUMN_1 = 20;
   int COLUMN_2 = 400;
+  int COLUMN_3 = 600;
   
   Artist artist; 
-  PImage artist_image;
   PieChart genderPieChart;
   TableView artist_info;
   
@@ -69,13 +111,9 @@ class ArtistDetailView extends View {
   {
     artist = a;
     if (artist == null) {
-      artist_image = data.getMissingImage();
       genderPieChart.data = new MissingPieChartDataSource();
       artist_info.data = new MissingTableDataSource("no data");
     } else {
-      ArrayList<String> image_urls = artist.getImageUrls();
-      if(image_urls.size() > 0) artist_image = loadImage(image_urls.get(0), "jpg");
-      else artist_image = data.getMissingImage();
       genderPieChart.data = artist.getGenderBreakdown();
       artist_info.data = new ArtistInfo(artist);
     }
@@ -111,10 +149,12 @@ class ArtistDetailView extends View {
   }
 
   void addSimilarArtistsChart(){
+  
     ArrayList<Artist> similar = artist.similar();
-    TableView artist_info = new TableView(COLUMN_1, ROW_3, 300, 200, Arrays.asList(
-      new TableColumn("Fact", 100), new TableColumn("Value", 100)), new ArtistInfo(artist));
+    TableView similar_artist_table = new TableView(COLUMN_3, ROW_1, 300, 400, Arrays.asList(
+      new TableColumn("Name", 100), new TableColumn("Image", 100, true)), new SimilarArtistEntry(similar));
     this.subviews.add(artist_info);
+    
   }
 
   void drawTitle(){
@@ -126,8 +166,8 @@ class ArtistDetailView extends View {
   }
   
   void drawImage(){ 
-    if(artist_image!=null)
-      image(artist_image, COLUMN_1, ROW_2);
+    if(artist!=null)
+      image(artist.getImage(), COLUMN_1, ROW_2);
   }
 
   void drawSongs(){

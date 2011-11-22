@@ -4,6 +4,7 @@ interface TableAction {
 
 interface TableDataSource {
   String getText(int index, int column);
+  PImage getImage(int index, int column);
   Object get(int index);
   int count();
   boolean selected(int index);
@@ -17,17 +18,24 @@ class MissingTableDataSource implements TableDataSource {
   Object get(int index) { return null; }
   int count() { return 1; }
   boolean selected(int index) { return false; }
+  PImage getImage(int index, int column){return null;}
 }
 
 class TableColumn {
   String label;
   float w;
   int align;
+  boolean imagable;
   
   TableColumn(String label, float w, int align) {
     this.label = label;
     this.w = w;
     this.align = align;
+  }
+
+  TableColumn(String label, float w, int align, boolean imagable){
+    this(label, w, align);
+    this.imagable = imagable;
   }
   
   TableColumn(String label, float w) {
@@ -88,7 +96,7 @@ class TableView extends View {
     this.data = data;
     action = null;
   }
-  
+
   int maxScroll()
   {
     return max(data.count() - int(h/rowHeight), 0);
@@ -154,7 +162,10 @@ class TableView extends View {
   void drawCell(int i, int j, TableColumn col, float colx)
   {
     textAlign(col.align, CENTER);
-    text(data.getText(i, j), colx + MARGIN, 0, col.w - MARGIN*2, rowHeight);
+    if(col.imagable)
+      image(data.getImage(i,j), colx + MARGIN, 0);
+    else
+      text(data.getText(i, j), colx + MARGIN, 0, col.w - MARGIN*2, rowHeight);
   }
   
   boolean contentPressed(float lx, float ly)
