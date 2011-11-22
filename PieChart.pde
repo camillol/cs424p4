@@ -17,6 +17,31 @@ class MissingPieChartDataSource implements PieChartDataSource {
   color getColor(int index) { return 0;  }
 }
 
+class AsyncPieChartDataSource implements PieChartDataSource {
+  Future<? extends PieChartDataSource> data;
+  MissingPieChartDataSource noData;
+  AsyncPieChartDataSource(Future<? extends PieChartDataSource> data) {
+    this.data = data;
+    noData = new MissingPieChartDataSource("loading...");
+  }
+  PieChartDataSource getData() {
+    if (data.isDone()) try {
+      return data.get();
+    } catch (InterruptedException e) {
+      println(e);
+    } catch (ExecutionException e) {
+      println(e);
+      noData.msg = "request failed";
+    }
+    return noData;
+  }
+  String getLabel(int index) { return getData().getLabel(index); }
+  float getValue(int index) { return getData().getValue(index); }
+  int count() { return getData().count(); }
+  float getTotal() { return getData().getTotal(); }
+  color getColor(int index) { return getData().getColor(index); }
+}
+
 class PieChart extends View
 {
   PieChartDataSource data;

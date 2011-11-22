@@ -71,7 +71,7 @@ class ArtistDetailView extends View {
     mapView = new MapView(300,400,400,220) {
       public void drawCountry(PShape cShape, String cc) {
         Country c = data.getCountryByCode(cc);
-        if (c != null && artist != null) {
+        if (c != null && artist != null && artist.getCountryBreakdown() != null) {
           Integer countInt = artist.getCountryBreakdown().get(c);
           int count = countInt == null ? 0 : countInt;
           fill(lerpColor(#ffffff, #ff0000, 1.0*count/artist.user_count));
@@ -98,7 +98,7 @@ class ArtistDetailView extends View {
       ArrayList<String> image_urls = artist.getImageUrls();
       if(image_urls.size() > 0) artist_image = loadImage(image_urls.get(0), "jpg");
       else artist_image = data.getMissingImage();
-      genderPieChart.data = artist.getGenderBreakdown();
+      genderPieChart.data = new AsyncPieChartDataSource(artist.getGenderBreakdown());
       artist_info.data = new ArtistInfo(artist);
       age_chart.data = artist.getAgeBreakdown();
     }

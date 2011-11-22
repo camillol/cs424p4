@@ -26,8 +26,8 @@ class Artist {
   ArtistAgeBreakdown age_breakdown;
   ArrayList<Artist> similar;
   public int user_count=0,song_count=0;
-  ArtistGenderBreakdown genderBreakdown = null;
-  Map<Country,Integer> countryBreakdown = null;
+  Future<ArtistGenderBreakdown> genderBreakdown = null;
+  Future<Map<Country,Integer>> countryBreakdown = null;
   
   public boolean user_count_set = false, song_count_set=false;
   Artist(String mbid, String name, String image_url){
@@ -85,58 +85,20 @@ class Artist {
   
   Map<Country,Integer> getCountryBreakdown()
   {
-    if(countryBreakdown == null) {
-      int total = 0;
-      String request = host + "artists/" + id + "/users/country_stats.json";
-      println(request);
-      try {
-        JSONArray result = new JSONArray(join(loadStrings(request), ""));
-        countryBreakdown = new HashMap<Country, Integer>();
-        for (int i = 0; i < result.length(); i++){
-          JSONObject aj = result.getJSONObject(i);
-          String cc = aj.getString("code");
-          int count = aj.getInt("count");
-          Country c = data.getCountryByCode(cc);
-          println(cc + " " + count + " " + c);
-          total += count;
-          countryBreakdown.put(c, count);
-        }
-        if (!user_count_set) {
-          user_count = total;
-          user_count_set = true;
-        }
-      }
-      catch (JSONException e) {
-        println (e);
-      }
+    if (countryBreakdown == null) countryBreakdown = data.getCountryBreakdown(this);
+    if (countryBreakdown.isDone()) try {
+      return countryBreakdown.get();
+    } catch (InterruptedException e) {
+      println(e);
+    } catch (ExecutionException e) {
+      println(e);
+//      loadStatus = "Server request failed.";
     }
-    return countryBreakdown;
+    return null;
   }
   
-  ArtistGenderBreakdown getGenderBreakdown(){
-    user_count = 0;
-    if(genderBreakdown == null){
-      int mCount = 0, fCount = 0, uCount = 0;
-      String request = host + "artists/" + id + "/users/gender_stats.json";
-      println(request);
-      try {
-        JSONArray result = new JSONArray(join(loadStrings(request), ""));
-        for (int i = 0; i < result.length(); i++){
-          JSONObject aj = result.getJSONObject(i);
-          String gender = aj.getString("gender");
-          int count = aj.getInt("count");
-          user_count += count;
-          if(gender.equals("null")) uCount = count;
-          else if(gender.equals("m")) mCount = count;
-          else if(gender.equals("f")) fCount = count;
-        }
-        genderBreakdown = new ArtistGenderBreakdown(mCount, fCount, uCount);
-      }
-      catch (JSONException e) {
-        println (e);
-      }
-    }
-    user_count_set = true;
+  Future<ArtistGenderBreakdown> getGenderBreakdown(){
+    if (genderBreakdown == null) genderBreakdown = data.getGenderBreakdown(this);
     return genderBreakdown;
   }
 
@@ -462,6 +424,74 @@ class WebDataSource {
     }
     return missingImage;
   }
+  
+  Future<Map<Country,Integer>> getCountryBreakdown(final Artist artist)
+  {
+    return loadExec.submit(new Callable<Map<Country,Integer>>() {
+      public Map<Country,Integer> call() {
+        Map<Country,Integer> countryBreakdown = null;
+        int total = 0;
+        String request = baseURL + "artists/" + artist.id + "/users/country_stats.json";
+        println(request);
+        
+        try {
+          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          countryBreakdown = new HashMap<Country, Integer>();
+          for (int i = 0; i < result.length(); i++){
+            JSONObject aj = result.getJSONObject(i);
+            String cc = aj.getString("code");
+            int count = aj.getInt("count");
+            Country c = getCountryByCode(cc);
+            countryBreakdown.put(c, count);
+            total += count;
+          }
+          if (!artist.user_count_set) {
+            artist.user_count = total;
+            artist.user_count_set = true;
+          }
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return countryBreakdown;
+      }
+    });
+  }
+  
+  Future<ArtistGenderBreakdown> getGenderBreakdown(final Artist artist)
+  {
+    return loadExec.submit(new Callable<ArtistGenderBreakdown>() {
+      public ArtistGenderBreakdown call() {
+        int total = 0;
+        ArtistGenderBreakdown genderBreakdown = null;
+        int mCount = 0, fCount = 0, uCount = 0;
+        String request = baseURL + "artists/" + artist.id + "/users/gender_stats.json";
+        println(request);
+        
+        try {
+          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          for (int i = 0; i < result.length(); i++){
+            JSONObject aj = result.getJSONObject(i);
+            String gender = aj.getString("gender");
+            int count = aj.getInt("count");
+            total += count;
+            if(gender.equals("null")) uCount = count;
+            else if(gender.equals("m")) mCount = count;
+            else if(gender.equals("f")) fCount = count;
+          }
+          genderBreakdown = new ArtistGenderBreakdown(mCount, fCount, uCount);
+          if (!artist.user_count_set) {
+            artist.user_count = total;
+            artist.user_count_set = true;
+          }
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return genderBreakdown;
+      }
+    });
+  }
 }
 
 class mbArtist{
@@ -475,6 +505,7 @@ class mbArtist{
   }
   
 }
+
 String songtoMbid(String song){
   XMLElement xml;
   String request = "http://musicbrainz.org/ws/2/recording/?query=" + song;
