@@ -19,6 +19,7 @@ PFont font;
 int normalFontSize;
 
 TabView mainTabView;
+ArtistDetailView artistDetailView;
 
 void setup()
 {
@@ -59,7 +60,7 @@ void setup()
 
   View artistDetailPane = mainTabView.tabs.get(1).pane;
   /* Eugine, add artist detail views to artistDetailPane.subviews */
-  ArtistDetailView artistDetailView = new ArtistDetailView(0,0,width,height);
+  artistDetailView = new ArtistDetailView(0,0,width,height);
   artistDetailView.setArtist(findArtist(4112));
   artistDetailPane.subviews.add(artistDetailView);
   
@@ -98,6 +99,12 @@ void setup()
   });
   
 //  mbidtoArtist("b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d");
+}
+
+void showArtistDetails(Artist artist)
+{
+  mainTabView.setActiveTab(mainTabView.tabs.get(1));
+  artistDetailView.setArtist(artist);
 }
 
 void draw()

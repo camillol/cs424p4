@@ -39,6 +39,7 @@ class PieChart extends View
     float total = data.getTotal();
     
     float theta = 0;
+    ellipseMode(CENTER);
     for (int i = 0; i < count; i++) {
       float angle = TWO_PI * data.getValue(i) / total;
       fill(data.getColor(i));
