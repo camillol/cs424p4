@@ -9,6 +9,9 @@ class ArtistDetailView extends View {
   int COLUMN_2 = 400;
   int COLUMN_3 = 500;
   
+  final static int IMAGE_WIDTH = 200;
+  final static int IMAGE_HEIGHT = 200;
+  
   Artist artist; 
   PieChart genderPieChart;
   TableView artist_info;
@@ -24,21 +27,24 @@ class ArtistDetailView extends View {
     
     artist_info = new TableView(COLUMN_1, ROW_3, 400, 200, Arrays.asList(
       new TableColumn("Fact", 100), new TableColumn("Value", 100)), new MissingTableDataSource("no data"));
-//    this.subviews.add(artist_info);
+    this.subviews.add(artist_info);
     
     age_chart = new BarChart(COLUMN_2, ROW_3, 400, 200, new MissingBarChartDataSource("no data"), true, true);
     age_chart.setTitle("Users count by age");
     this.subviews.add(age_chart);
     
     mapView = new MapView(300,400,400,220) {
+      public void drawOcean(PShape oShape) {
+        fill(#333344);
+        shape(oShape, 0, 0);
+      }
       public void drawCountry(PShape cShape, String cc) {
         Country c = data.getCountryByCode(cc);
         if (c != null && artist != null && artist.getCountryBreakdown() != null) {
-          Integer countInt = artist.getCountryBreakdown().get(c);
-          int count = countInt == null ? 0 : countInt;
-          fill(lerpColor(#ffffff, #ff0000, 1.0*count/artist.user_count));
+          int count = artist.getCountryBreakdown().get(c);
+          fill(lerpColor(#000000, #ff0000, 1.0*count/artist.getCountryBreakdown().maxCount));
         } else {
-          fill(#eeeeee);
+          fill(0);
         }
         super.drawCountry(cShape, cc);
       }
@@ -83,11 +89,18 @@ class ArtistDetailView extends View {
     textSize(normalFontSize);
   }
   
-  void drawImage(){ 
+  void drawImageInRect(PImage img, float x, float y, float w, float h)
+  {
+    float s = min(w/img.width, h/img.height);
+    float iw = img.width*s;
+    float ih = img.height*s;
+    image(img, x + (w-iw)/2, y + (h-ih)/2, iw, ih);
+  }
+  
+  void drawImage(){
+    rect(COLUMN_1, ROW_2, IMAGE_WIDTH, IMAGE_HEIGHT);
     if(artist != null) {
-      PImage img = artist.getImage();
-      float s = min((float)300/img.width, (float)300/img.height);
-      image(img, COLUMN_1, ROW_2, img.width*s, img.height*s);
+      drawImageInRect(artist.getImage(), COLUMN_1, ROW_2, IMAGE_WIDTH, IMAGE_HEIGHT);
     }
   }
   

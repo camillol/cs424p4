@@ -13,7 +13,7 @@ class Artist {
   ArrayList<Artist> similar;
   public int user_count=0,song_count=0;
   Future<ArtistGenderBreakdown> genderBreakdown = null;
-  Future<Map<Country,Integer>> countryBreakdown = null;
+  Future<ArtistCountryBreakdown> countryBreakdown = null;
   
   public boolean user_count_set = false, song_count_set=false;
   Artist(String mbid, String name, String image_url){
@@ -62,7 +62,7 @@ class Artist {
     return song_count;
   }*/
   
-  Map<Country,Integer> getCountryBreakdown()
+  ArtistCountryBreakdown getCountryBreakdown()
   {
     if (countryBreakdown == null) countryBreakdown = data.getCountryBreakdown(this);
     if (countryBreakdown.isDone()) try {
@@ -341,6 +341,23 @@ class ArtistAgeBreakdown implements BarChartDataSource {
   public color getColor(int index) { int x = (int)(((float)(index+1) / ranges.size()) * 255); return x; }
 }
 
+class ArtistCountryBreakdown {
+  Map<Country,Integer> counts;
+  int maxCount;
+  ArtistCountryBreakdown() {
+    counts = new HashMap<Country,Integer>();
+    maxCount = 0;
+  }
+  void put(Country c, int count) {
+    counts.put(c,count);
+    maxCount = max(maxCount, count);
+  }
+  int get(Country c) {
+    Integer countInt = counts.get(c);
+    return countInt == null ? 0 : countInt;
+  }
+}
+
 class WebDataSource {
   String baseURL;
   ExecutorService loadExec;
@@ -463,18 +480,18 @@ class WebDataSource {
     return loadingImage;
   }
   
-  Future<Map<Country,Integer>> getCountryBreakdown(final Artist artist)
+  Future<ArtistCountryBreakdown> getCountryBreakdown(final Artist artist)
   {
-    return loadExec.submit(new Callable<Map<Country,Integer>>() {
-      public Map<Country,Integer> call() {
-        Map<Country,Integer> countryBreakdown = null;
+    return loadExec.submit(new Callable<ArtistCountryBreakdown>() {
+      public ArtistCountryBreakdown call() {
+        ArtistCountryBreakdown countryBreakdown = null;
         int total = 0;
         String request = baseURL + "artists/" + artist.id + "/users/country_stats.json";
         println(request);
         
         try {
           JSONArray result = new JSONArray(join(loadStrings(request), ""));
-          countryBreakdown = new HashMap<Country, Integer>();
+          countryBreakdown = new ArtistCountryBreakdown();
           for (int i = 0; i < result.length(); i++){
             JSONObject aj = result.getJSONObject(i);
             String cc = aj.getString("code");
@@ -524,6 +541,7 @@ class WebDataSource {
           }
         }
         catch (JSONException e) {
+          println("getGenderBreakdown");
           println (e);
         }
         return genderBreakdown;
@@ -545,6 +563,7 @@ class WebDataSource {
           }
         }
         catch (JSONException e) {
+          println("getAgeBreakdown");
           println (e);
         }
         return age_breakdown;
@@ -562,6 +581,7 @@ class WebDataSource {
           return new JSONDictionarySource(result);
         }
         catch (JSONException e) {
+          println("getArtistInfo");
           println (e);
         }
         return null;
@@ -583,6 +603,7 @@ class WebDataSource {
           }
         }
         catch (JSONException e) {
+          println("getSimilarArtists");
           println (e);
         }
         return new ArtistList(similar);
