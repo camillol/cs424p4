@@ -82,7 +82,7 @@ class PieChart extends View
     }
     if (title != null) {
       textAlign(CENTER, BOTTOM);
-      textSize(20);
+//      textSize(20);
       text(title, w/2, 0);
       textSize(normalFontSize);
     }

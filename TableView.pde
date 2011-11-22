@@ -104,6 +104,7 @@ class TableView extends View {
   color fgColor = color(255);
   color selBgColor = color(128);
   color selFgColor = color(255);
+  color borderColor = 128;
   
   List<TableColumn> columns;
   TableDataSource data;

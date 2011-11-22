@@ -653,7 +653,7 @@ class WebDataSource {
     return loadExec.submit(new Callable<ArtistList>() {
       public ArtistList call() {
         List<Artist> similar = new ArrayList<Artist>();
-        String request = baseURL + "artists/" + artist.id + "/similar.json";
+        String request = baseURL + "artists/" + artist.id + "/similar.json" + userFilter.queryString();
         println(request);
         try {
           JSONArray result = new JSONArray(join(loadStrings(request), ""));

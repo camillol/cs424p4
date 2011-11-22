@@ -55,9 +55,9 @@ class MapView extends View {
     
     popMatrix();
     
-    stroke(#00FF00);
+/*    stroke(#00FF00);
     noFill();
-    rect(0,0,w,h);
+    rect(0,0,w,h);*/
   }
   
   void drawOcean(PShape oShape) {

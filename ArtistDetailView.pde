@@ -12,6 +12,16 @@ class ArtistDetailView extends View {
   final static int IMAGE_WIDTH = 200;
   final static int IMAGE_HEIGHT = 200;
   
+  final static int SIMILAR_WIDTH = 440;
+  final static int SIMILAR_HEIGHT = 200;
+  
+  final static int MAP_WIDTH = 400;
+  final static int MAP_HEIGHT = 220;
+  
+  final static int AGE_HEIGHT = 200;
+  
+  final static int INFO_WIDTH = 280;
+  
   Artist artist; 
   PieChart genderPieChart;
   TableView artist_info;
@@ -23,18 +33,19 @@ class ArtistDetailView extends View {
   ArtistDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
     
-    genderPieChart = new PieChart(COLUMN_2, ROW_2, 200, 200, new MissingPieChartDataSource("no data"), true, "Listeners by gender");
+    genderPieChart = new PieChart(w-300, 40, 200, 200, new MissingPieChartDataSource("no data"), true, "Listeners by gender");
     this.subviews.add(genderPieChart);
     
-    artist_info = new TableView(COLUMN_1, ROW_3, 400, 200, Arrays.asList(
-      new TableColumn("Fact", 100), new TableColumn("Value", 100)), new MissingTableDataSource("no data"));
+    artist_info = new TableView(240, 100, INFO_WIDTH, 340, Arrays.asList(
+      new TableColumn("Fact", INFO_WIDTH*0.4), new TableColumn("Value", INFO_WIDTH*0.6)), new MissingTableDataSource("no data"));
+    artist_info.borderColor = 0;
     this.subviews.add(artist_info);
     
-    age_chart = new BarChart(COLUMN_2, ROW_3, 400, 200, new MissingBarChartDataSource("no data"), true, true);
+    age_chart = new BarChart(w-MAP_WIDTH-20, h-MAP_HEIGHT - AGE_HEIGHT - 40, MAP_WIDTH, AGE_HEIGHT, new MissingBarChartDataSource("no data"), true, true);
     age_chart.setTitle("Users count by age");
     this.subviews.add(age_chart);
     
-    mapView = new MapView(300,400,400,220) {
+    mapView = new MapView(w-MAP_WIDTH-20,h-MAP_HEIGHT-20,MAP_WIDTH,MAP_HEIGHT) {
       public void drawOcean(PShape oShape) {
         fill(#333344);
         shape(oShape, 0, 0);
@@ -52,7 +63,9 @@ class ArtistDetailView extends View {
     };
     this.subviews.add(mapView);
     
-    ufView = new UserFilterView(COLUMN_3, ROW_1-20,  300, 20, new UserFilter());
+    subviews.add(new Label(20, h-SIMILAR_HEIGHT-60, SIMILAR_WIDTH, 20, "Similar"));
+
+    ufView = new UserFilterView(20, h-SIMILAR_HEIGHT-40,  SIMILAR_WIDTH, 20, new UserFilter());
     ufView.setAction(new Action<UserFilterView>() {
       public void respond(UserFilterView ufv) {
         if (artist != null) similar_artist_table.data = new AsyncTableDataSource(data.getSimilarArtists(artist, ufView.userFilter));
@@ -60,8 +73,8 @@ class ArtistDetailView extends View {
     });
     subviews.add(ufView);
     
-    similar_artist_table = new TableView(COLUMN_3, ROW_1, 300, 400, Arrays.asList(
-      new TableColumn("Name", 100), new TableColumn("Image", 100, true)), new MissingTableDataSource("no data"));
+    similar_artist_table = new TableView(20, h-SIMILAR_HEIGHT-20, SIMILAR_WIDTH, SIMILAR_HEIGHT, Arrays.asList(
+      new TableColumn("Name", SIMILAR_WIDTH*0.8), new TableColumn("Image", SIMILAR_WIDTH*0.2, true)), new MissingTableDataSource("no data"));
     similar_artist_table.setRowHeight(200);
     similar_artist_table.action = new TableAction() {
       public void itemClicked(TableView tv, int index, Object item) {
@@ -100,7 +113,7 @@ class ArtistDetailView extends View {
     textAlign(BOTTOM);
     fill(200);
     textSize(40);
-    text(getTitle(), COLUMN_1,ROW_1);
+    text(getTitle(), 240, 60);
     textSize(normalFontSize);
   }
   
@@ -113,9 +126,9 @@ class ArtistDetailView extends View {
   }
   
   void drawImage(){
-    rect(COLUMN_1, ROW_2, IMAGE_WIDTH, IMAGE_HEIGHT);
+    rect(20, 40, IMAGE_WIDTH, IMAGE_HEIGHT);
     if(artist != null) {
-      drawImageInRect(artist.getImage(), COLUMN_1, ROW_2, IMAGE_WIDTH, IMAGE_HEIGHT);
+      drawImageInRect(artist.getImage(), 20, 40, IMAGE_WIDTH, IMAGE_HEIGHT);
     }
   }
   
