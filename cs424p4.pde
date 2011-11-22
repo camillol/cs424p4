@@ -108,6 +108,14 @@ void setup()
     }
   };
   timePane.subviews.add(mapView); 
+  timePane.subviews.add(new View(760, 360, 100, 100) {
+    public void drawContent(float lx, float ly) {
+      textSize(30);
+      fill(255);
+      text("GMT: " + second() % 24, 0, 0);
+      textSize(normalFontSize);
+    }
+  }); 
   
   
   
