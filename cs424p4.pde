@@ -20,6 +20,7 @@ int normalFontSize;
 
 TabView mainTabView;
 ArtistDetailView artistDetailView;
+SongDetailView songDetailView;
 
 void setup()
 {
@@ -41,7 +42,7 @@ void setup()
   
   rootView = new View(0, 0, width, height);
   
-  mainTabView = new TabView(10, 10, width-20, height-20, Arrays.asList("Top Artists", "Artist Details", "Map Test"));
+  mainTabView = new TabView(10, 10, width-20, height-20, Arrays.asList("Top Artists", "Artist Details", "Songs", "Time"));
   rootView.subviews.add(mainTabView);
   
   View topArtistsPane = mainTabView.tabs.get(0).pane;
@@ -64,7 +65,11 @@ void setup()
 //  artistDetailView.setArtist(findArtist(4112));
   artistDetailPane.subviews.add(artistDetailView);
   
-  View mapTestPane = mainTabView.tabs.get(2).pane;
+  View songPane = mainTabView.tabs.get(2).pane;
+  songDetailView = new SongDetailView(0,0,songPane.w,songPane.h);
+  songPane.subviews.add(songDetailView);
+  
+/*  View mapTestPane = mainTabView.tabs.get(2).pane;
 
   MapView mapView = new MapView(100,100,400,300) {
     public void drawCountry(PShape cShape, String cc) {
@@ -89,7 +94,13 @@ void setup()
     public int count() { return barLabels.length; }
     public float getMaxValue() { return barMax; }
     public color getColor(int index) { return barColors[index % barColors.length]; }
-  }, true, true));
+  }, true, true));*/
+  
+  View timePane = mainTabView.tabs.get(3).pane;
+  timePane.subviews.add(new Label(40, 20, 300, 20, "Songs played by local time"));
+  BarChart timeBarChart = new BarChart(40, 40, 700, 200, new AsyncBarChartDataSource(data.getLocalTimePlays()), true, true);
+  timePane.subviews.add(timeBarChart);
+  
   
   // I want to add true multitouch support, but let's have this as a stopgap for now
   addMouseWheelListener(new java.awt.event.MouseWheelListener() {

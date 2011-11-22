@@ -358,6 +358,32 @@ class ArtistCountryBreakdown {
   }
 }
 
+class LocalTimePlays implements BarChartDataSource {
+  Map<Country, int[]> byCountry;
+  int byHour[];
+  int maxValue;
+  
+  LocalTimePlays() {
+    byCountry = new HashMap<Country,int[]>();
+    byHour = new int[24];
+    maxValue = 0;
+  }
+  
+  void put(Country c, int hr, int count) {
+    if (!byCountry.containsKey(c)) byCountry.put(c, new int[24]);
+//    byHour[hr] -= byCountry.get(c)[hr];
+    byCountry.get(c)[hr] = count;
+    byHour[hr] += count;
+    maxValue = max(maxValue, byHour[hr]);
+  }
+  
+  String getLabel(int index) {return str(index);}
+  float getValue(int index) { return byHour[index]; }
+  int count() {return 24;}
+  float getMaxValue() {return maxValue;}
+  color getColor(int index) { return #aaaaaa; }
+}
+
 class WebDataSource {
   String baseURL;
   ExecutorService loadExec;
@@ -621,6 +647,31 @@ class WebDataSource {
           else artist.image_url = missingImageUrl();
         }
         return loadImage(artist.image_url, "jpg");
+      }
+    });
+  }
+  
+  Future<LocalTimePlays> getLocalTimePlays()
+  {
+    return loadExec.submit(new Callable<LocalTimePlays>() {
+      public LocalTimePlays call() {
+        LocalTimePlays ltp = null;
+        String request = baseURL + "plays_by_hour";
+        println(request);
+        try {
+          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          ltp = new LocalTimePlays();
+          for (int i = 0; i < result.length(); i++){
+            JSONObject aj = result.getJSONObject(i);
+            Country c = getCountryByCode(aj.getString("country_code"));
+            ltp.put(c, aj.getInt("local_hour"), aj.getInt("plays"));
+          }
+        }
+        catch (JSONException e) {
+          println("getLocalTimePlays");
+          println (e);
+        }
+        return ltp;
       }
     });
   }

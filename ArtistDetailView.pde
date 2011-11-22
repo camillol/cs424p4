@@ -124,3 +124,16 @@ class ArtistDetailView extends View {
     drawImage();   
   }
 }
+
+class SongDetailView extends View {
+  TextField searchField;
+  
+  SongDetailView(float x_, float y_, float w_, float h_){
+    super(x_,y_,w_,h_);
+    
+    searchField = new TextField(20, 20, 300, 20);
+    subviews.add(searchField);
+  }
+}
+
+
