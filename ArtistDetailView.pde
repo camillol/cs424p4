@@ -132,7 +132,6 @@ class ArtistDetailView extends View {
   {
     artist = a;
     if (artist == null) {
-      artist_image = data.getMissingImage();
       genderPieChart.data = new MissingPieChartDataSource("no data");
       artist_info.data = new MissingTableDataSource("no data");
       age_chart.data = new MissingBarChartDataSource("no data");
@@ -153,7 +152,7 @@ class ArtistDetailView extends View {
   
     ArrayList<Artist> similar = artist.similar();
     TableView similar_artist_table = new TableView(COLUMN_3, ROW_1, 300, 400, Arrays.asList(
-      new TableColumn("Name", 100), new TableColumn("Image", 100, true)), new SimilarArtistEntry(similar));
+      new TableColumn("Name", 100), new TableColumn("Image", 100)), new SimilarArtistEntry(similar));
     this.subviews.add(artist_info);
     
   }
