@@ -42,6 +42,7 @@ class TextField extends View {
   {
     if (key == CODED) println(keyCode);
     else {
+      if (key == ENTER) return;
       if (key == BACKSPACE && value.length() > 0) value = value.substring(0, value.length()-1);
       else value = value + key;
       if (action != null) action.respond(this);

@@ -66,6 +66,12 @@ class ArtistDetailView extends View {
     
     songTable = new TableView(20, h-SIMILAR_HEIGHT-60 - 220, 400, 200, Arrays.asList(
       new TableColumn("Title", 200)), new MissingTableDataSource("no data"));
+    songTable.action = new TableAction() {
+      public void itemClicked(TableView tv, int index, Object item) {
+        Song song = (Song)item;
+        showSongDetails(song);
+      }
+    };
     this.subviews.add(songTable);
     
     
@@ -150,8 +156,11 @@ class SongDetailView extends View {
   TextField searchField;
   Button searchButton;
   TableView searchResults;
+  TableView songInfo;
   
   Song song;
+  
+  final static int INFO_WIDTH = 400;
   
   SongDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
@@ -170,8 +179,29 @@ class SongDetailView extends View {
     subviews.add(searchButton);
     
     searchResults = new TableView(20, 40, 400, 100, Arrays.asList(
-      new TableColumn("Name", 100), new TableColumn("Artist", 100)), new MissingTableDataSource("no data"));
+      new TableColumn("Title", 300), new TableColumn("Artist", 100)), new MissingTableDataSource("no data"));
+    searchResults.action = new TableAction() {
+      public void itemClicked(TableView tv, int index, Object item) {
+        Song song = (Song)item;
+        showSongDetails(song);
+      }
+    };
     this.subviews.add(searchResults);
+    
+    songInfo = new TableView(240, 240, INFO_WIDTH, 340, Arrays.asList(
+      new TableColumn("Fact", INFO_WIDTH*0.4), new TableColumn("Value", INFO_WIDTH*0.6)), new MissingTableDataSource("no data"));
+//    songInfo.borderColor = 0;
+    this.subviews.add(songInfo);
+  }
+  
+  void setSong(Song s)
+  {
+    song = s;
+    if (song == null) {
+      songInfo.data = new MissingTableDataSource("no data");
+    } else {
+      songInfo.data = new AsyncTableDataSource(data.getSongInfo(song));
+    }
   }
   
   String getTitle()

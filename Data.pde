@@ -830,6 +830,24 @@ class WebDataSource {
       }
     });
   }
+  
+  Future<JSONDictionarySource> getSongInfo(final Song song) {
+    return loadExec.submit(new Callable<JSONDictionarySource>() {
+      public JSONDictionarySource call() {
+        String request = baseURL + "songs/" + song.id + "/info.json?mbid=" + song.mbid;
+        println(request);
+        try {
+          JSONObject result = new JSONObject(join(loadStrings(request), ""));
+          return new JSONDictionarySource(result);
+        }
+        catch (JSONException e) {
+          println("getArtistInfo");
+          println (e);
+        }
+        return null;
+      }
+    });
+  }
 }
 
 class mbArtist{

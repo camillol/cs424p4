@@ -138,6 +138,12 @@ void showArtistDetails(Artist artist)
   artistDetailView.setArtist(artist);
 }
 
+void showSongDetails(Song song)
+{
+  mainTabView.setActiveTab(mainTabView.tabs.get(2));
+  songDetailView.setSong(song);
+}
+
 void draw()
 {
   background(backgroundColor); 
