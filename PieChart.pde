@@ -7,9 +7,12 @@ interface PieChartDataSource {
 }
 
 class MissingPieChartDataSource implements PieChartDataSource {
-  String getLabel(int index) { return "no data"; }
-  float getValue(int index) { return 0; }
-  int count() { return 0; }
+  String msg;
+  
+  MissingPieChartDataSource(String msg_) { msg = msg_; }
+  String getLabel(int index) { return msg; }
+  float getValue(int index) { return 1; }
+  int count() { return 1; }
   float getTotal() { return 1; }
   color getColor(int index) { return 0;  }
 }
@@ -36,6 +39,7 @@ class PieChart extends View
     float total = data.getTotal();
     
     float theta = 0;
+    ellipseMode(CENTER);
     for (int i = 0; i < count; i++) {
       float angle = TWO_PI * data.getValue(i) / total;
       fill(data.getColor(i));
@@ -50,6 +54,12 @@ class PieChart extends View
         text(data.getLabel(i), w/2 + cos(labelAngle)*d/4, h/2 + sin(labelAngle)*d/4);
       }
       theta += angle;
+    }
+    if (title != null) {
+      textAlign(CENTER, BOTTOM);
+      textSize(20);
+      text(title, w/2, 0);
+      textSize(normalFontSize);
     }
   }
   

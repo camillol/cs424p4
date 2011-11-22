@@ -118,6 +118,12 @@ class TopArtistView extends View implements TableDataSource {
       new TableColumn("Artist", w*0.8),
       new TableColumn("Plays", w*0.2, RIGHT)
     ), this); // new MissingListDataSource("no artists")
+    artistTable.action = new TableAction() {
+      public void itemClicked(TableView tv, int index, Object item) {
+        ArtistChartEntry entry = (ArtistChartEntry)item;
+        showArtistDetails(entry.artist);
+      }
+    };
     subviews.add(artistTable);
     subviews.add(new TableHeader(0, 20, w, 20, artistTable));
     

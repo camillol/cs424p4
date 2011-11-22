@@ -12,13 +12,14 @@ color borderColor = 128;
 WebDataSource data;
 
 Checkbox testCB;
-String host = "http://localhost:3000/"; 
-//String host = "http://radiogaga.heroku.com/";
+//String host = "http://localhost:3000/"; 
+String host = "http://radiogaga.heroku.com/";
 
 PFont font;
 int normalFontSize;
 
 TabView mainTabView;
+ArtistDetailView artistDetailView;
 
 void setup()
 {
@@ -59,9 +60,14 @@ void setup()
 
   View artistDetailPane = mainTabView.tabs.get(1).pane;
   /* Eugine, add artist detail views to artistDetailPane.subviews */
+<<<<<<< HEAD
   Artist artist = findArtist(154704);
   ArtistDetailView artistDetailView = new ArtistDetailView(0,0,width,height);
   artistDetailView.setArtist(artist);
+=======
+  artistDetailView = new ArtistDetailView(0,0,width,height);
+  artistDetailView.setArtist(findArtist(4112));
+>>>>>>> 7383028eee28633bb06933ca38190954841c855c
   artistDetailPane.subviews.add(artistDetailView);
   
   View mapTestPane = mainTabView.tabs.get(2).pane;
@@ -99,6 +105,12 @@ void setup()
   });
   
 //  mbidtoArtist("b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d");
+}
+
+void showArtistDetails(Artist artist)
+{
+  mainTabView.setActiveTab(mainTabView.tabs.get(1));
+  artistDetailView.setArtist(artist);
 }
 
 void draw()

@@ -25,10 +25,11 @@ class Artist {
   String image_url;
   PImage image;
   
-  ArrayList<ArtistAgeBreakdown> age_breakdown;
+  ArtistAgeBreakdown age_breakdown;
   ArrayList<Artist> similar;
   public int user_count=0,song_count=0;
   ArtistGenderBreakdown genderBreakdown = null;
+  Map<Country,Integer> countryBreakdown = null;
   
   public boolean user_count_set = false, song_count_set=false;
   Artist(String mbid, String name, String image_url){
@@ -98,6 +99,36 @@ class Artist {
     return song_count;
   }
   
+  Map<Country,Integer> getCountryBreakdown()
+  {
+    if(countryBreakdown == null) {
+      int total = 0;
+      String request = host + "artists/" + id + "/users/country_stats.json";
+      println(request);
+      try {
+        JSONArray result = new JSONArray(join(loadStrings(request), ""));
+        countryBreakdown = new HashMap<Country, Integer>();
+        for (int i = 0; i < result.length(); i++){
+          JSONObject aj = result.getJSONObject(i);
+          String cc = aj.getString("code");
+          int count = aj.getInt("count");
+          Country c = data.getCountryByCode(cc);
+          println(cc + " " + count + " " + c);
+          total += count;
+          countryBreakdown.put(c, count);
+        }
+        if (!user_count_set) {
+          user_count = total;
+          user_count_set = true;
+        }
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    return countryBreakdown;
+  }
+  
   ArtistGenderBreakdown getGenderBreakdown(){
     user_count = 0;
     if(genderBreakdown == null){
@@ -125,9 +156,9 @@ class Artist {
     return genderBreakdown;
   }
 
-  ArrayList<ArtistAgeBreakdown> getAgeBreakdown(){
+  ArtistAgeBreakdown getAgeBreakdown(){
     if(age_breakdown == null){
-      age_breakdown = new ArrayList<ArtistAgeBreakdown>();
+      age_breakdown = new ArtistAgeBreakdown();
       String request = host + "artists/" + id + "/users/age_stats.json";
       println(request);
       try {
@@ -135,7 +166,7 @@ class Artist {
         for (int i = 0; i < result.length(); i++){
           JSONObject aj = result.getJSONObject(i);
           System.out.println(aj);
-          age_breakdown.add(new ArtistAgeBreakdown(aj.getString("age_range"), aj.getInt("count")));
+          age_breakdown.add(new ArtistAgeBreakdownEntry(aj.getString("age_range"), aj.getInt("count")));
         }
       }
       catch (JSONException e) {
@@ -310,13 +341,33 @@ class ArtistGenderBreakdown implements PieChartDataSource {
   }
 }
 
-class ArtistAgeBreakdown{
+class ArtistAgeBreakdownEntry {
   public String ageRange;
   public int count;
-  ArtistAgeBreakdown(String ageRange, int count){
+  ArtistAgeBreakdownEntry(String ageRange, int count){
     this.ageRange = ageRange;
     this.count = count;
   }
+}
+class ArtistAgeBreakdown implements BarChartDataSource {
+  List<ArtistAgeBreakdownEntry> ranges;
+  int maxCount;
+  ArtistAgeBreakdown() {
+    ranges = new ArrayList<ArtistAgeBreakdownEntry>();
+    maxCount = 0;
+  }
+  
+  void add(ArtistAgeBreakdownEntry e)
+  {
+    ranges.add(e);
+    maxCount = max(maxCount, e.count);
+  }
+
+  String getLabel(int index) { return ranges.get(index).ageRange; }
+  float getValue(int index) { return ranges.get(index).count; }
+  public int count() { return ranges.size(); }
+  public float getMaxValue() { return maxCount; }
+  public color getColor(int index) { int x = (int)(((float)(index+1) / ranges.size()) * 255); return x; }
 }
 
 class WebDataSource {
