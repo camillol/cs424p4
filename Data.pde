@@ -27,6 +27,7 @@ class Artist {
   ArrayList<Artist> similar;
   public int user_count=0,song_count=0;
   ArtistGenderBreakdown genderBreakdown = null;
+  Map<Country,Integer> countryBreakdown = null;
   
   public boolean user_count_set = false, song_count_set=false;
   Artist(String mbid, String name, String image_url){
@@ -80,6 +81,36 @@ class Artist {
       }
     }
     return song_count;
+  }
+  
+  Map<Country,Integer> getCountryBreakdown()
+  {
+    if(countryBreakdown == null) {
+      int total = 0;
+      String request = host + "artists/" + id + "/users/country_stats.json";
+      println(request);
+      try {
+        JSONArray result = new JSONArray(join(loadStrings(request), ""));
+        countryBreakdown = new HashMap<Country, Integer>();
+        for (int i = 0; i < result.length(); i++){
+          JSONObject aj = result.getJSONObject(i);
+          String cc = aj.getString("code");
+          int count = aj.getInt("count");
+          Country c = data.getCountryByCode(cc);
+          println(cc + " " + count + " " + c);
+          total += count;
+          countryBreakdown.put(c, count);
+        }
+        if (!user_count_set) {
+          user_count = total;
+          user_count_set = true;
+        }
+      }
+      catch (JSONException e) {
+        println (e);
+      }
+    }
+    return countryBreakdown;
   }
   
   ArtistGenderBreakdown getGenderBreakdown(){

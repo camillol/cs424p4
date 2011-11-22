@@ -52,6 +52,7 @@ class ArtistDetailView extends View {
   PieChart genderPieChart;
   TableView artist_info;
   BarChart age_chart;
+  MapView mapView;
   
   ArtistDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
@@ -66,6 +67,21 @@ class ArtistDetailView extends View {
     age_chart = new BarChart(COLUMN_2, ROW_3, 400, 200, new MissingBarChartDataSource("no data"), true, true);
     age_chart.setTitle("Users count by age");
     this.subviews.add(age_chart);
+    
+    mapView = new MapView(300,400,400,220) {
+      public void drawCountry(PShape cShape, String cc) {
+        Country c = data.getCountryByCode(cc);
+        if (c != null && artist != null) {
+          Integer countInt = artist.getCountryBreakdown().get(c);
+          int count = countInt == null ? 0 : countInt;
+          fill(lerpColor(#ffffff, #ff0000, 1.0*count/artist.user_count));
+        } else {
+          fill(#eeeeee);
+        }
+        super.drawCountry(cShape, cc);
+      }
+    };
+    this.subviews.add(mapView);
 
     setArtist(null);
   }
