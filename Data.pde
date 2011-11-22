@@ -35,7 +35,7 @@ class Artist {
     } catch (InterruptedException e) {
       println(e);
     } catch (ExecutionException e) {
-      println(e);
+      println("getImage" + e);
 //      loadStatus = "Server request failed.";
     }
     return data.getLoadingImage();

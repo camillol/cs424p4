@@ -18,6 +18,7 @@ class ArtistDetailView extends View {
   BarChart age_chart;
   MapView mapView;
   TableView similar_artist_table;
+  UserFilterView ufView;
   
   ArtistDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
@@ -51,9 +52,23 @@ class ArtistDetailView extends View {
     };
     this.subviews.add(mapView);
     
+    ufView = new UserFilterView(COLUMN_3, ROW_1-20,  300, 20, new UserFilter());
+    ufView.setAction(new Action<UserFilterView>() {
+      public void respond(UserFilterView ufv) {
+        if (artist != null) similar_artist_table.data = new AsyncTableDataSource(data.getSimilarArtists(artist, ufView.userFilter));
+      }
+    });
+    subviews.add(ufView);
+    
     similar_artist_table = new TableView(COLUMN_3, ROW_1, 300, 400, Arrays.asList(
       new TableColumn("Name", 100), new TableColumn("Image", 100, true)), new MissingTableDataSource("no data"));
     similar_artist_table.setRowHeight(200);
+    similar_artist_table.action = new TableAction() {
+      public void itemClicked(TableView tv, int index, Object item) {
+        Artist artist = (Artist)item;
+        showArtistDetails(artist);
+      }
+    };
     this.subviews.add(similar_artist_table);
 
     setArtist(null);
@@ -71,7 +86,7 @@ class ArtistDetailView extends View {
       genderPieChart.data = new AsyncPieChartDataSource(artist.getGenderBreakdown());
       artist_info.data = new AsyncTableDataSource(data.getArtistInfo(artist));
       age_chart.data = new AsyncBarChartDataSource(artist.getAgeBreakdown());
-      similar_artist_table.data = new AsyncTableDataSource(data.getSimilarArtists(artist, null));
+      similar_artist_table.data = new AsyncTableDataSource(data.getSimilarArtists(artist, ufView.userFilter));
     }
   }
   
