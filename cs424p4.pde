@@ -12,8 +12,8 @@ color borderColor = 128;
 WebDataSource data;
 
 Checkbox testCB;
-String host = "http://localhost:3000/"; 
-//String host = "http://radiogaga.heroku.com/";
+//String host = "http://localhost:3000/"; 
+String host = "http://radiogaga.heroku.com/";
 
 PFont font;
 int normalFontSize;

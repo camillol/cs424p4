@@ -94,39 +94,25 @@ class TopArtistsTable extends TableView {
   }
 }
 
-class TopArtistView extends View implements TableDataSource {
+class UserFilterView extends View {
   UserFilter userFilter;
+  Action<UserFilterView> action;
   GlyphCheckbox maleCB;
   GlyphCheckbox femaleCB;
   GlyphCheckbox noGenderCB;
   TextField ageFromField;
   TextField ageToField;
-  TableView artistTable;
-  Future<List<ArtistChartEntry>> artists;
-  String artistsStatus;
   CountryChooser countryChooser;
-  
+
   final static int GENDER_LABEL_WIDTH = 40;
   final static int AGE_LABEL_WIDTH = 50;
   
-  TopArtistView(float x_, float y_, float w_, float h_, UserFilter initialFilter)
+  UserFilterView(float x_, float y_, float w_, float h_, UserFilter initialFilter)
   {
     super(x_,y_,w_,h_);
     this.userFilter = initialFilter;
-    
-    artistTable = new TopArtistsTable(0, 40, w, h-40, Arrays.asList(
-      new TableColumn("Artist", w*0.8),
-      new TableColumn("Plays", w*0.2, RIGHT)
-    ), this); // new MissingListDataSource("no artists")
-    artistTable.action = new TableAction() {
-      public void itemClicked(TableView tv, int index, Object item) {
-        ArtistChartEntry entry = (ArtistChartEntry)item;
-        showArtistDetails(entry.artist);
-      }
-    };
-    subviews.add(artistTable);
-    subviews.add(new TableHeader(0, 20, w, 20, artistTable));
-    
+    this.action = null;
+
     HorizontalLayout layout = new HorizontalLayout(this);
     
     layout.add(new Label(0, 0, GENDER_LABEL_WIDTH,20, "Sex:", RIGHT));
@@ -168,24 +154,6 @@ class TopArtistView extends View implements TableDataSource {
         filterChanged();
       }
     });
-    
-//    ageFromField.value = "0";
-//    ageToField.value = "122";  // longest documented human life
-
-    reloadArtists();
-  }
-  PImage getImage(int index, int column){return null;}
-  
-  int stringToAge(String s)
-  {
-    int a;
-    try {
-      a = Integer.parseInt(s);
-    }
-    catch (NumberFormatException e) {
-      a = DONTCARE;
-    }
-    return a;
   }
   
   GlyphCheckbox makeGenderCheckbox(final int flag, String letter, int x, int y)
@@ -203,8 +171,72 @@ class TopArtistView extends View implements TableDataSource {
     return cb;
   }
   
+  int stringToAge(String s)
+  {
+    int a;
+    try {
+      a = Integer.parseInt(s);
+    }
+    catch (NumberFormatException e) {
+      a = DONTCARE;
+    }
+    return a;
+  }
+  
+  void setAction(Action<UserFilterView> action)
+  {
+    this.action = action;
+  }
+  
   void filterChanged()
   {
+    if (action != null) action.respond(this);
+  }
+}
+
+class TopArtistView extends View implements TableDataSource {
+  UserFilter userFilter;
+  UserFilterView ufView;
+  TableView artistTable;
+  Future<List<ArtistChartEntry>> artists;
+  String artistsStatus;
+  
+  TopArtistView(float x_, float y_, float w_, float h_, UserFilter initialFilter)
+  {
+    super(x_,y_,w_,h_);
+    this.userFilter = initialFilter;
+    
+    artistTable = new TopArtistsTable(0, 40, w, h-40, Arrays.asList(
+      new TableColumn("Artist", w*0.8),
+      new TableColumn("Plays", w*0.2, RIGHT)
+    ), this); // new MissingListDataSource("no artists")
+    artistTable.action = new TableAction() {
+      public void itemClicked(TableView tv, int index, Object item) {
+        ArtistChartEntry entry = (ArtistChartEntry)item;
+        showArtistDetails(entry.artist);
+      }
+    };
+    subviews.add(artistTable);
+    subviews.add(new TableHeader(0, 20, w, 20, artistTable));
+    
+    ufView = new UserFilterView(0, 0, w, 20, initialFilter);
+    ufView.setAction(new Action<UserFilterView>() {
+      public void respond(UserFilterView ufv) {
+        filterChanged();
+      }
+    });
+    subviews.add(ufView);
+    
+//    ageFromField.value = "0";
+//    ageToField.value = "122";  // longest documented human life
+
+    reloadArtists();
+  }
+  PImage getImage(int index, int column){return null;}
+  
+  void filterChanged()
+  {
+    userFilter = ufView.userFilter;
     reloadArtists();
   }
   
