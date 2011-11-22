@@ -17,6 +17,7 @@ class MissingTableDataSource implements TableDataSource {
   Object get(int index) { return null; }
   int count() { return 1; }
   boolean selected(int index) { return false; }
+  PImage getImage(int index, int column){return null;}
 }
 
 class AsyncTableDataSource implements TableDataSource {
@@ -112,7 +113,7 @@ class TableView extends View {
     this.data = data;
     action = null;
   }
-  
+
   int maxScroll()
   {
     return max(data.count() - int(h/rowHeight), 0);

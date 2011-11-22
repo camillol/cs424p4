@@ -2,6 +2,10 @@ import org.json.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+String missingImageUrl(){
+  return host + "assets/photo_not_available.jpg";
+}
+
 public Artist findArtist(int id){
   String request = host + "artists/" + id + ".json";
   println(request);
@@ -20,6 +24,7 @@ class Artist {
   String mbid;
   String name;
   String image_url;
+  PImage image;
   
   Future<ArtistAgeBreakdown> ageBreakdown;
   ArrayList<Artist> similar;
@@ -38,6 +43,20 @@ class Artist {
     this.id = id;
     this.mbid = mbid;
     this.name = name;
+  }
+
+  PImage getImage(){
+    if(image == null){
+      if(image_url == null){
+        ArrayList<String> image_urls = this.getImageUrls();
+        if(image_urls.size() > 0) 
+          image_url = image_urls.get(0);
+        else
+          image_url = missingImageUrl();
+      }
+      image = loadImage(image_url, "jpg");
+    }
+    return image;
   }
 
   ArrayList<Artist> similar(){
@@ -425,11 +444,10 @@ class WebDataSource {
       }
     });
   }
-  
   PImage getMissingImage()
   {
     if (missingImage == null) {
-      missingImage = loadImage(baseURL + "assets/photo_not_available.jpg", "jpg");
+      missingImage = loadImage(missingImageUrl(), "jpg");
     }
     return missingImage;
   }
@@ -571,3 +589,4 @@ String songtoMbid(String song){
                     xml.getChild(0).getChild(3).getChild(0).getContent(), 
                     xml.getChild(0).getChild(3).getChild(1).getContent());
 }
+
