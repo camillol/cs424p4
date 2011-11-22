@@ -22,7 +22,6 @@ class MissingTableDataSource implements TableDataSource {
 }
 
 class AsyncTableDataSource implements TableDataSource {
-   PImage getImage(int index, int column){ return null;}
   Future<? extends TableDataSource> data;
   MissingTableDataSource noData;
   AsyncTableDataSource(Future<? extends TableDataSource> data) {
@@ -44,6 +43,7 @@ class AsyncTableDataSource implements TableDataSource {
   Object get(int index) { return getData().get(index); }
   int count() { return getData().count(); }
   boolean selected(int index) { return getData().selected(index); }
+  PImage getImage(int index, int column) { return getData().getImage(index, column); }
 }
 
 class TableColumn {
@@ -191,10 +191,13 @@ class TableView extends View {
   void drawCell(int i, int j, TableColumn col, float colx)
   {
     textAlign(col.align, CENTER);
-    if(col.imagable && data.getImage(i,j) != null)
-      image(data.getImage(i,j), colx + MARGIN, 0);
-    else
+    if(col.imagable && data.getImage(i,j) != null) {
+      PImage img = data.getImage(i,j);
+      float s = min((float)col.w/img.width, (float)rowHeight/img.height);
+      image(img, colx, 0, img.width*s, img.height*s);
+    } else {
       text(data.getText(i, j), colx + MARGIN, 0, col.w - MARGIN*2, rowHeight);
+    }
   }
   
   boolean contentPressed(float lx, float ly)

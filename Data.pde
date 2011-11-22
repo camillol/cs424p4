@@ -541,7 +541,6 @@ class WebDataSource {
           JSONArray result = new JSONArray(join(loadStrings(request), ""));
           for (int i = 0; i < result.length(); i++){
             JSONObject aj = result.getJSONObject(i);
-            System.out.println(aj);
             age_breakdown.add(new ArtistAgeBreakdownEntry(aj.getString("age_range"), aj.getInt("count")));
           }
         }

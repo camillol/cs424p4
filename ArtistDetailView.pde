@@ -84,8 +84,11 @@ class ArtistDetailView extends View {
   }
   
   void drawImage(){ 
-    if(artist!=null)
-      image(artist.getImage(), COLUMN_1, ROW_2);
+    if(artist != null) {
+      PImage img = artist.getImage();
+      float s = min((float)300/img.width, (float)300/img.height);
+      image(img, COLUMN_1, ROW_2, img.width*s, img.height*s);
+    }
   }
   
   void drawContent(float lx, float ly){
