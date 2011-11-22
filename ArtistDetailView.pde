@@ -29,6 +29,7 @@ class ArtistDetailView extends View {
   MapView mapView;
   TableView similar_artist_table;
   UserFilterView ufView;
+  TableView songTable;
   
   ArtistDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
@@ -63,6 +64,11 @@ class ArtistDetailView extends View {
     };
     this.subviews.add(mapView);
     
+    songTable = new TableView(20, h-SIMILAR_HEIGHT-60 - 220, 400, 200, Arrays.asList(
+      new TableColumn("Title", 200)), new MissingTableDataSource("no data"));
+    this.subviews.add(songTable);
+    
+    
     subviews.add(new Label(20, h-SIMILAR_HEIGHT-60, SIMILAR_WIDTH, 20, "Similar"));
 
     ufView = new UserFilterView(20, h-SIMILAR_HEIGHT-40,  SIMILAR_WIDTH, 20, new UserFilter());
@@ -95,11 +101,13 @@ class ArtistDetailView extends View {
       artist_info.data = new MissingTableDataSource("no data");
       age_chart.data = new MissingBarChartDataSource("no data");
       similar_artist_table.data = new MissingTableDataSource("no data");
+      songTable.data = new MissingTableDataSource("no data");
     } else {
       genderPieChart.data = new AsyncPieChartDataSource(artist.getGenderBreakdown());
       artist_info.data = new AsyncTableDataSource(data.getArtistInfo(artist));
       age_chart.data = new AsyncBarChartDataSource(artist.getAgeBreakdown());
       similar_artist_table.data = new AsyncTableDataSource(data.getSimilarArtists(artist, ufView.userFilter));
+      songTable.data = new AsyncTableDataSource(data.getArtistSongs(artist));
     }
   }
   

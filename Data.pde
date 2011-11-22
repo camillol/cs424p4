@@ -802,6 +802,34 @@ class WebDataSource {
       }
     });
   }
+  
+  
+  Future<SongList> getArtistSongs(final Artist artist){
+    return loadExec.submit(new Callable<SongList>() {
+      public SongList call() {
+        List<Song> songs = new ArrayList<Song>();
+        String resultStr = null;
+        try {
+          String request = baseURL + "artists/" + artist.id + "/songs/brainz";
+          println(request);
+          resultStr = join(loadStrings(request), "");
+          JSONArray result = new JSONArray(resultStr);
+          for (int i = 0; i < result.length(); i++){
+            JSONObject aj = result.getJSONObject(i);
+            JSONObject artj = aj.getJSONObject("artist");
+            songs.add(new Song(-1, aj.getString("mbid"), aj.getString("title"),
+              new Artist(artj.getInt("id"), artj.getString("mbid"), artj.getString("name"))));
+          }
+        }
+        catch (JSONException e) {
+          println("artistSongs");
+          println (e);
+          println(resultStr);
+        }
+        return new SongList(songs);
+      }
+    });
+  }
 }
 
 class mbArtist{
