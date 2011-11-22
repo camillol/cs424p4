@@ -520,6 +520,30 @@ class WebDataSource {
     });
   }
   
+  Future<ArtistChart> getTopArtistsForWeek(final int yr, final int week)
+  {
+    return loadExec.submit(new Callable<ArtistChart>() {
+      public ArtistChart call() {
+        List<ArtistChartEntry> entries = new ArrayList<ArtistChartEntry>(10);
+        String request = baseURL + "artists/top_by_week/" + yr + "/" + week + ".json";
+        println(request);
+        
+        try {
+          JSONArray result = new JSONArray(loadRequest(request));
+          for (int i = 0; i < result.length(); i++) {
+            JSONObject aj = result.getJSONObject(i);
+            Artist artist = new Artist(aj.getInt("id"), aj.getString("mbid"), aj.getString("name"));
+            entries.add(new ArtistChartEntry(artist, aj.getInt("plays")));
+          }
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return new ArtistChart(entries);
+      }
+    });
+  }
+  
   String missingImageUrl(){
     return baseURL + "assets/photo_not_available.jpg";
   }

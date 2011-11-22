@@ -55,9 +55,12 @@ void setup()
   demoFilter.ageMin = 20;
   demoFilter.ageMax = 30;
   demoFilter.gender = FEMALE;
-  TopArtistView topArtistsB = new TopArtistView(20, 300, 460, 240, demoFilter);
+  TopArtistView topArtistsB = new TopArtistView(520, 20, 460, 240, demoFilter);
   //rootView.subviews.add(topArtistsB);  
-  topArtistsPane.subviews.add(topArtistsB); 
+  topArtistsPane.subviews.add(topArtistsB);
+  
+  topArtistsPane.subviews.add(new WeeklyTopArtistView(280, 340, 400, 240, 2008, 1));
+  
 
   View artistDetailPane = mainTabView.tabs.get(1).pane;
   /* Eugine, add artist detail views to artistDetailPane.subviews */

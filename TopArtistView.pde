@@ -255,3 +255,58 @@ class TopArtistView extends View {
   }
 }
 
+class WeeklyTopArtistView extends View {
+  int wtaYear;
+  int wtaWeek;
+  TableView weekTopArtistTable;
+  
+  WeeklyTopArtistView(float x_, float y_, float w_, float h_, int yr, int week)
+  {
+    super(x_,y_,w_,h_);
+    wtaYear = yr;
+    wtaWeek = week;
+    weekTopArtistTable = new TopArtistsTable(0, 40, w, h-40, Arrays.asList(
+      new TableColumn("Artist", w*0.8),
+      new TableColumn("Plays", w*0.2, RIGHT)
+    ), new AsyncTableDataSource(data.getTopArtistsForWeek(wtaYear, wtaWeek)));
+    
+    weekTopArtistTable.action = new TableAction() {
+      public void itemClicked(TableView tv, int index, Object item) {
+        ArtistChartEntry entry = (ArtistChartEntry)item;
+        showArtistDetails(entry.artist);
+      }
+    };
+    subviews.add(weekTopArtistTable);
+    subviews.add(new TableHeader(0, 20, w, 20, weekTopArtistTable));
+    Button prevWeekB = new Button(0, 0, 40, 20, "<<");
+    prevWeekB.setAction(new Action<Button>() {
+      public void respond(Button b) {
+        wtaWeek--;
+        if (wtaWeek < 1) {
+          wtaWeek = 52;
+          wtaYear--;
+        }
+        weekTopArtistTable.data = new AsyncTableDataSource(data.getTopArtistsForWeek(wtaYear, wtaWeek));
+      }
+    });
+    Button nextWeekB = new Button(w-40, 0, 40, 20, ">>");
+    nextWeekB.setAction(new Action<Button>() {
+      public void respond(Button b) {
+        wtaWeek++;
+        if (wtaWeek > 52) {
+          wtaWeek = 1;
+          wtaYear++;
+        }
+        weekTopArtistTable.data = new AsyncTableDataSource(data.getTopArtistsForWeek(wtaYear, wtaWeek));
+      }
+    });
+    subviews.add(prevWeekB);
+    subviews.add(nextWeekB);
+  }
+  
+  void drawContent(float lx, float ly) {
+    textAlign(CENTER, CENTER);
+    text(wtaYear + " week " + wtaWeek, 0, 0, w, 20);
+  }
+}
+
