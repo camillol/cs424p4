@@ -13,7 +13,7 @@ WebDataSource data;
 
 Checkbox testCB;
 //String host = "http://localhost:3000/"; 
-String host = "http://radiogaga.heroku.com/";
+//String host = "http://radiogaga.heroku.com/";
 
 PFont font;
 int normalFontSize;
@@ -31,7 +31,7 @@ void setup()
   smooth();
 
   /* load data */
-  data = new WebDataSource(host);
+  data = new WebDataSource("http://radiogaga.heroku.com/");
   
   /* setup UI */
   font = loadFont("Helvetica-14.vlw");

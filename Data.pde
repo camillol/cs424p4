@@ -2,29 +2,12 @@ import org.json.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-String missingImageUrl(){
-  return host + "assets/photo_not_available.jpg";
-}
-
-public Artist findArtist(int id){
-  String request = host + "artists/" + id + ".json";
-  println(request);
-  try {
-    JSONObject result = new JSONObject(join(loadStrings(request), ""));
-    return new Artist(result.getInt("id"), result.getString("mbid"), result.getString("name"));
-  }
-  catch (JSONException e) {
-       println (e);
-  }
-  return null;
-}
-
 class Artist {
   int id;
   String mbid;
   String name;
   String image_url;
-  PImage image;
+  Future<PImage> image;
   
   Future<ArtistAgeBreakdown> ageBreakdown;
   ArrayList<Artist> similar;
@@ -46,17 +29,16 @@ class Artist {
   }
 
   PImage getImage(){
-    if(image == null){
-      if(image_url == null){
-        ArrayList<String> image_urls = this.getImageUrls();
-        if(image_urls.size() > 0) 
-          image_url = image_urls.get(0);
-        else
-          image_url = missingImageUrl();
-      }
-      image = loadImage(image_url, "jpg");
+    if(image == null) image = data.getArtistImage(this);
+    if (image.isDone()) try {
+      return image.get();
+    } catch (InterruptedException e) {
+      println(e);
+    } catch (ExecutionException e) {
+      println(e);
+//      loadStatus = "Server request failed.";
     }
-    return image;
+    return data.getLoadingImage();
   } 
   
   
@@ -367,6 +349,7 @@ class WebDataSource {
   Map<String, Country> countryCodeMap;
   
   PImage missingImage = null;
+  PImage loadingImage = null;
   
   WebDataSource(String baseURL)
   {
@@ -459,12 +442,25 @@ class WebDataSource {
       }
     });
   }
+  
+  String missingImageUrl(){
+    return baseURL + "assets/photo_not_available.jpg";
+  }
+  
   PImage getMissingImage()
   {
     if (missingImage == null) {
       missingImage = loadImage(missingImageUrl(), "jpg");
     }
     return missingImage;
+  }
+  
+  PImage getLoadingImage()
+  {
+    if (loadingImage == null) {
+      loadingImage = loadImage(missingImageUrl(), "jpg");
+    }
+    return loadingImage;
   }
   
   Future<Map<Country,Integer>> getCountryBreakdown(final Artist artist)
@@ -593,6 +589,33 @@ class WebDataSource {
         return new ArtistList(similar);
       }
     });
+  }
+  
+  Future<PImage> getArtistImage(final Artist artist)
+  {
+    return loadExec.submit(new Callable<PImage>() {
+      public PImage call() {
+        if(artist.image_url == null){
+          ArrayList<String> image_urls = LastFmWrapper.getImageUrls(artist.name);
+          if(image_urls.size() > 0) artist.image_url = image_urls.get(0);
+          else artist.image_url = missingImageUrl();
+        }
+        return loadImage(artist.image_url, "jpg");
+      }
+    });
+  }
+  
+  public Artist findArtist(int id){
+    String request = baseURL + "artists/" + id + ".json";
+    println(request);
+    try {
+      JSONObject result = new JSONObject(join(loadStrings(request), ""));
+      return new Artist(result.getInt("id"), result.getString("mbid"), result.getString("name"));
+    }
+    catch (JSONException e) {
+       println (e);
+    }
+    return null;
   }
 }
 

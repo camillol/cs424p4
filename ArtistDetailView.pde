@@ -24,7 +24,7 @@ class ArtistDetailView extends View {
     
     artist_info = new TableView(COLUMN_1, ROW_3, 400, 200, Arrays.asList(
       new TableColumn("Fact", 100), new TableColumn("Value", 100)), new MissingTableDataSource("no data"));
-    this.subviews.add(artist_info);
+//    this.subviews.add(artist_info);
     
     age_chart = new BarChart(COLUMN_2, ROW_3, 400, 200, new MissingBarChartDataSource("no data"), true, true);
     age_chart.setTitle("Users count by age");
