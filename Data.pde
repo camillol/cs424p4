@@ -2,8 +2,6 @@ import org.json.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-
-
 public Artist findArtist(int id){
   String request = host + "artists/" + id + ".json";
   println(request);
@@ -23,7 +21,7 @@ class Artist {
   String name;
   String image_url;
   
-  ArtistAgeBreakdown age_breakdown;
+  Future<ArtistAgeBreakdown> ageBreakdown;
   ArrayList<Artist> similar;
   public int user_count=0,song_count=0;
   Future<ArtistGenderBreakdown> genderBreakdown = null;
@@ -67,7 +65,7 @@ class Artist {
     return LastFmWrapper.getImageUrls(name);
   }
 
-  int getSongCount(){
+/*  int getSongCount(){
     if(!song_count_set){
       String request = host + "artists/" + id + "/songs.json";
       println(request);
@@ -81,7 +79,7 @@ class Artist {
       }
     }
     return song_count;
-  }
+  }*/
   
   Map<Country,Integer> getCountryBreakdown()
   {
@@ -102,27 +100,12 @@ class Artist {
     return genderBreakdown;
   }
 
-  ArtistAgeBreakdown getAgeBreakdown(){
-    if(age_breakdown == null){
-      age_breakdown = new ArtistAgeBreakdown();
-      String request = host + "artists/" + id + "/users/age_stats.json";
-      println(request);
-      try {
-        JSONArray result = new JSONArray(join(loadStrings(request), ""));
-        for (int i = 0; i < result.length(); i++){
-          JSONObject aj = result.getJSONObject(i);
-          System.out.println(aj);
-          age_breakdown.add(new ArtistAgeBreakdownEntry(aj.getString("age_range"), aj.getInt("count")));
-        }
-      }
-      catch (JSONException e) {
-        println (e);
-      }
-    }
-    return age_breakdown;
+  Future<ArtistAgeBreakdown> getAgeBreakdown(){
+    if (ageBreakdown == null) ageBreakdown = data.getAgeBreakdown(this);
+    return ageBreakdown;
   }
 
-  int getUserCount(){
+/*  int getUserCount(){
     if(!user_count_set){
       String request = host + "artists/" + id + "/users.json";
       println(request);
@@ -137,6 +120,32 @@ class Artist {
       }
     }
     return user_count;
+  }*/
+}
+
+class JSONDictionarySource implements TableDataSource{
+  JSONObject jobj;
+  JSONDictionarySource(JSONObject jobj){
+    this.jobj = jobj;
+  }
+  String getText(int index, int column) {
+    try {
+      String k = jobj.names().getString(index);
+      if (column == 0) return k;
+      else return jobj.getString(k);
+    } catch (JSONException e) {
+      println(e);
+      return "";
+    }
+  }
+  Object get(int index){
+    return null;
+  }
+  int count(){
+    return jobj.length();
+  }
+  boolean selected(int index){
+    return false;
   }
 }
 
@@ -489,6 +498,45 @@ class WebDataSource {
           println (e);
         }
         return genderBreakdown;
+      }
+    });
+  }
+  
+  Future<ArtistAgeBreakdown> getAgeBreakdown(final Artist artist){
+    return loadExec.submit(new Callable<ArtistAgeBreakdown>() {
+      public ArtistAgeBreakdown call() {
+        ArtistAgeBreakdown age_breakdown = new ArtistAgeBreakdown();
+        String request = baseURL + "artists/" + artist.id + "/users/age_stats.json";
+        println(request);
+        try {
+          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          for (int i = 0; i < result.length(); i++){
+            JSONObject aj = result.getJSONObject(i);
+            System.out.println(aj);
+            age_breakdown.add(new ArtistAgeBreakdownEntry(aj.getString("age_range"), aj.getInt("count")));
+          }
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return age_breakdown;
+      }
+    });
+  }
+  
+  Future<JSONDictionarySource> getArtistInfo(final Artist artist) {
+    return loadExec.submit(new Callable<JSONDictionarySource>() {
+      public JSONDictionarySource call() {
+        String request = baseURL + "artists/" + artist.id + "/info.json";
+        println(request);
+        try {
+          JSONObject result = new JSONObject(join(loadStrings(request), ""));
+          return new JSONDictionarySource(result);
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return null;
       }
     });
   }

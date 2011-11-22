@@ -19,6 +19,30 @@ class MissingTableDataSource implements TableDataSource {
   boolean selected(int index) { return false; }
 }
 
+class AsyncTableDataSource implements TableDataSource {
+  Future<? extends TableDataSource> data;
+  MissingTableDataSource noData;
+  AsyncTableDataSource(Future<? extends TableDataSource> data) {
+    this.data = data;
+    noData = new MissingTableDataSource("loading...");
+  }
+  TableDataSource getData() {
+    if (data.isDone()) try {
+      return data.get();
+    } catch (InterruptedException e) {
+      println(e);
+    } catch (ExecutionException e) {
+      println(e);
+      noData.msg = "request failed";
+    }
+    return noData;
+  }
+  String getText(int index, int column) { return getData().getText(index,column); }
+  Object get(int index) { return getData().get(index); }
+  int count() { return getData().count(); }
+  boolean selected(int index) { return getData().selected(index); }
+}
+
 class TableColumn {
   String label;
   float w;
