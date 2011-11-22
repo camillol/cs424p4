@@ -20,7 +20,7 @@ class ArtistDetailView extends View {
     PImage getImage(int index, int column){
       Artist artist = artists.get(index);
       if(column == 1){
-        return artist.image;
+        return artist.getImage();
       }
       else{
         return null;
@@ -88,7 +88,7 @@ class ArtistDetailView extends View {
   int ROW_3 = 400;
   int COLUMN_1 = 20;
   int COLUMN_2 = 400;
-  int COLUMN_3 = 600;
+  int COLUMN_3 = 500;
   
   Artist artist; 
   PieChart genderPieChart;
@@ -139,6 +139,7 @@ class ArtistDetailView extends View {
       genderPieChart.data = artist.getGenderBreakdown();
       artist_info.data = new ArtistInfo(artist);
       age_chart.data = artist.getAgeBreakdown();
+      addSimilarArtistsTable();
     }
   }
   
@@ -148,12 +149,14 @@ class ArtistDetailView extends View {
     else return artist.name;
   }
 
-  void addSimilarArtistsChart(){
+  void addSimilarArtistsTable(){
   
     ArrayList<Artist> similar = artist.similar();
+    System.out.println("SIZE OF SIMILAR ITEMS: " + similar.size());
     TableView similar_artist_table = new TableView(COLUMN_3, ROW_1, 300, 400, Arrays.asList(
-      new TableColumn("Name", 100), new TableColumn("Image", 100)), new SimilarArtistEntry(similar));
-    this.subviews.add(artist_info);
+      new TableColumn("Name", 100), new TableColumn("Image", 100, true)), new SimilarArtistEntry(similar));
+    similar_artist_table.setRowHeight(200);
+    this.subviews.add(similar_artist_table);
     
   }
 
@@ -169,20 +172,9 @@ class ArtistDetailView extends View {
     if(artist!=null)
       image(artist.getImage(), COLUMN_1, ROW_2);
   }
-
-  void drawSongs(){
-    
-  }
-  
-  void drawFacts(){
-    
-  }
   
   void drawContent(float lx, float ly){
     drawTitle();
-    drawImage();
-    drawSongs();
-    drawFacts();
-    
+    drawImage();   
   }
 }

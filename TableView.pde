@@ -41,6 +41,11 @@ class TableColumn {
   TableColumn(String label, float w) {
     this(label, w, LEFT);
   }
+  TableColumn(String label, float w, boolean imagable) {
+    this(label, w);
+    this.imagable = imagable;
+  }
+
 }
 
 class TableHeader extends View {
@@ -72,7 +77,7 @@ class TableHeader extends View {
 }
 
 class TableView extends View {
-  final int rowHeight = 20;
+  int rowHeight = 20;
   final int barSize = 14;
   
   color bgColor = color(0);
@@ -95,6 +100,10 @@ class TableView extends View {
     this.columns = columns;
     this.data = data;
     action = null;
+  }
+  
+  void setRowHeight(int rowHeight){
+    rowHeight = rowHeight;
   }
 
   int maxScroll()
@@ -162,7 +171,7 @@ class TableView extends View {
   void drawCell(int i, int j, TableColumn col, float colx)
   {
     textAlign(col.align, CENTER);
-    if(col.imagable)
+    if(col.imagable && data.getImage(i,j) != null)
       image(data.getImage(i,j), colx + MARGIN, 0);
     else
       text(data.getText(i, j), colx + MARGIN, 0, col.w - MARGIN*2, rowHeight);
