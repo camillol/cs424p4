@@ -57,26 +57,6 @@ class Artist {
       image = loadImage(image_url, "jpg");
     }
     return image;
-  }
-
-  ArrayList<Artist> similar(){
-    if(similar == null){
-      similar = new ArrayList<Artist>();
-      String request = host + "artists/" + id + "/similar.json";
-      println(request);
-      try {
-        JSONArray result = new JSONArray(join(loadStrings(request), ""));
-        for (int i = 0; i < result.length(); i++){
-          JSONObject aj = result.getJSONObject(i);
-          System.out.println(aj);
-          similar.add(new Artist(aj.getString("mbid"), aj.getString("name"), aj.getString("thumbnail")));
-        }
-      }
-      catch (JSONException e) {
-        println (e);
-      }
-    }
-    return similar;
   } 
   
   
@@ -278,6 +258,22 @@ class Song {
   }
 }
 
+class ArtistList implements TableDataSource {
+  List<Artist> artists;
+  
+  ArtistList(List<Artist> artists) {
+    this.artists = artists;
+  }
+  
+  String getText(int index, int column) {
+    if (column == 0) return artists.get(index).name;
+    else return artists.get(index).image_url;
+  }
+  Object get(int index) { return artists.get(index); }
+  int count() { return artists.size(); }
+  boolean selected(int index) { return false; }
+  PImage getImage(int index, int column){ return column == 1 ? artists.get(index).getImage() : null; }
+}
 
 
 class ArtistChartEntry {
@@ -574,6 +570,27 @@ class WebDataSource {
           println (e);
         }
         return null;
+      }
+    });
+  }
+  
+  Future<ArtistList> getSimilarArtists(final Artist artist, final UserFilter userFilter){
+    return loadExec.submit(new Callable<ArtistList>() {
+      public ArtistList call() {
+        List<Artist> similar = new ArrayList<Artist>();
+        String request = baseURL + "artists/" + artist.id + "/similar.json";
+        println(request);
+        try {
+          JSONArray result = new JSONArray(join(loadStrings(request), ""));
+          for (int i = 0; i < result.length(); i++){
+            JSONObject aj = result.getJSONObject(i);
+            similar.add(new Artist(aj.getString("mbid"), aj.getString("name"), aj.getString("thumbnail")));
+          }
+        }
+        catch (JSONException e) {
+          println (e);
+        }
+        return new ArtistList(similar);
       }
     });
   }

@@ -1,44 +1,7 @@
 import java.util.*;
 
 class ArtistDetailView extends View {
-  class SimilarArtistEntry implements TableDataSource{
-    ArrayList<Artist> artists;
-
-    SimilarArtistEntry(ArrayList<Artist> artists){
-      this.artists = artists;
-    }
-    String getText(int index, int column){
-      Artist artist = artists.get(index);
-      if(column == 0){
-        return artist.name;
-      }
-      else{
-        return artist.image_url;
-      }
-    }
-
-    PImage getImage(int index, int column){
-      Artist artist = artists.get(index);
-      if(column == 1){
-        return artist.getImage();
-      }
-      else{
-        return null;
-      }
-    }
-
-    Object get(int index){
-        return new Object();
-    }
-
-    int count(){
-      return artists.size();
-    }
-    boolean selected(int index){
-      return false;
-    }
-  }
-
+  
   int ROW_1 = 50;
   int ROW_2 = 100;
   int ROW_3 = 400;
@@ -51,6 +14,7 @@ class ArtistDetailView extends View {
   TableView artist_info;
   BarChart age_chart;
   MapView mapView;
+  TableView similar_artist_table;
   
   ArtistDetailView(float x_, float y_, float w_, float h_){
     super(x_,y_,w_,h_);
@@ -80,6 +44,11 @@ class ArtistDetailView extends View {
       }
     };
     this.subviews.add(mapView);
+    
+    similar_artist_table = new TableView(COLUMN_3, ROW_1, 300, 400, Arrays.asList(
+      new TableColumn("Name", 100), new TableColumn("Image", 100, true)), new MissingTableDataSource("no data"));
+    similar_artist_table.setRowHeight(200);
+    this.subviews.add(similar_artist_table);
 
     setArtist(null);
   }
@@ -91,11 +60,12 @@ class ArtistDetailView extends View {
       genderPieChart.data = new MissingPieChartDataSource("no data");
       artist_info.data = new MissingTableDataSource("no data");
       age_chart.data = new MissingBarChartDataSource("no data");
+      similar_artist_table.data = new MissingTableDataSource("no data");
     } else {
       genderPieChart.data = new AsyncPieChartDataSource(artist.getGenderBreakdown());
       artist_info.data = new AsyncTableDataSource(data.getArtistInfo(artist));
       age_chart.data = new AsyncBarChartDataSource(artist.getAgeBreakdown());
-      addSimilarArtistsTable();
+      similar_artist_table.data = new AsyncTableDataSource(data.getSimilarArtists(artist, null));
     }
   }
   
@@ -103,16 +73,6 @@ class ArtistDetailView extends View {
   {
     if (artist == null) return "<no artist>";
     else return artist.name;
-  }
-
-  void addSimilarArtistsTable(){
-  
-    ArrayList<Artist> similar = artist.similar();
-    System.out.println("SIZE OF SIMILAR ITEMS: " + similar.size());
-    TableView similar_artist_table = new TableView(COLUMN_3, ROW_1, 300, 400, Arrays.asList(
-      new TableColumn("Name", 100), new TableColumn("Image", 100, true)), new SimilarArtistEntry(similar));
-    similar_artist_table.setRowHeight(200);
-    this.subviews.add(similar_artist_table);
   }
 
   void drawTitle(){
